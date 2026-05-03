@@ -40,7 +40,7 @@ const Index = () => {
                 <br />Você precisa <span className="italic">agir</span> sobre o que já sabe.
               </h1>
               <p className="text-lg md:text-xl text-cream/80 mb-8 leading-relaxed max-w-xl">
-                Um guia direto para quem vive cheio de ideias, metas e clareza, mas trava na hora de executar — e termina o dia com a sensação de potencial desperdiçado.
+                Um guia direto para quem vive cheio de ideias, metas e clareza, mas trava na hora de executar. Termina o dia com a sensação de potencial desperdiçado.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-10">
@@ -85,7 +85,7 @@ const Index = () => {
             <span className="block text-secondary italic">Mas, de novo, não fez.</span>
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed text-balance mb-12">
-            Você consome conteúdo bom. Faz anotações. Tem ideias que poderiam mudar o seu ano. Sente, por dentro, que existe uma versão sua muito maior esperando para sair. Mas a semana passa, o mês passa — e a vida continua igual.
+            Você consome conteúdo bom. Faz anotações. Tem ideias que poderiam mudar o seu ano. Sente, por dentro, que existe uma versão sua muito maior esperando para sair. Mas a semana passa, o mês passa. E a vida continua igual.
           </p>
           <div className="grid md:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
             {[
@@ -120,7 +120,7 @@ const Index = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { icon: Layers, t: "Excesso de ruído", d: "Mil estímulos, vozes e prioridades disputando sua atenção ao mesmo tempo." },
-              { icon: Brain, t: "Mente desorganizada", d: "Tudo é importante, tudo é urgente — e nada termina." },
+              { icon: Brain, t: "Mente desorganizada", d: "Tudo é importante, tudo é urgente. E nada termina." },
               { icon: Compass, t: "Falta de direção prática", d: "Você sabe o destino, mas não sabe qual passo dar agora." },
               { icon: Map, t: "Ausência de método", d: "Sem um sistema repetível, cada dia vira improviso e desgaste." },
             ].map(({ icon: Icon, t, d }) => (
@@ -154,7 +154,7 @@ const Index = () => {
             {[
               { icon: Sparkles, t: "Clareza mental", d: "Saiba, sem ruído, o que importa de verdade hoje." },
               { icon: Compass, t: "Direção", d: "Pare de viver no improviso. Tenha um norte concreto." },
-              { icon: Target, t: "Mais foco", d: "Faça menos coisas, melhor — e termine o que começa." },
+              { icon: Target, t: "Mais foco", d: "Faça menos coisas, melhor. Termine o que começa." },
               { icon: Zap, t: "Menos procrastinação", d: "Quebre o ciclo de adiar o que é importante para você." },
               { icon: Repeat, t: "Mais constância", d: "Construa progresso real, mesmo em semanas difíceis." },
               { icon: Rocket, t: "Insight em resultado", d: "Transforme aprendizado em ação aplicada na vida real." },
@@ -186,11 +186,11 @@ const Index = () => {
 
           <div className="grid md:grid-cols-2 gap-5">
             {[
-              { n: "01", t: "Entendimento dos bloqueios", d: "Por que você trava — e como reconhecer o padrão antes que ele te paralise de novo." },
-              { n: "02", t: "Reorganização da mente e das prioridades", d: "Tire o peso da cabeça. Coloque cada coisa no seu lugar — incluindo o que precisa sair." },
+              { n: "01", t: "Entendimento dos bloqueios", d: "Por que você trava, e como reconhecer o padrão antes que ele te paralise de novo." },
+              { n: "02", t: "Reorganização da mente e das prioridades", d: "Tire o peso da cabeça. Coloque cada coisa no seu lugar, incluindo o que precisa sair." },
               { n: "03", t: "Da percepção ao plano", d: "Pegue o insight solto e transforme-o em um plano simples, claro e executável." },
               { n: "04", t: "Construção de ação repetível", d: "Crie um sistema mínimo que funciona até nos seus piores dias." },
-              { n: "05", t: "Aplicação prática na rotina", d: "Encaixe a execução na vida real — sem virar mais um projeto que você abandona." },
+              { n: "05", t: "Aplicação prática na rotina", d: "Encaixe a execução na vida real, sem virar mais um projeto que você abandona." },
               { n: "06", t: "Constância sem esforço sobre-humano", d: "Aprenda a manter o ritmo quando a motivação inevitavelmente cai." },
             ].map(({ n, t, d }) => (
               <div key={n} className="flex gap-5 p-6 rounded-2xl bg-cream/[0.06] border border-cream/10 backdrop-blur hover:bg-cream/[0.1] transition-colors">
@@ -283,7 +283,7 @@ const Index = () => {
                   Manual do Insight à Ação
                 </h2>
                 <p className="text-cream/80 text-lg mb-8 max-w-lg">
-                  Um guia prático para tomar decisões com propósito e gerar impacto real — em qualquer rotina.
+                  Um guia prático para tomar decisões com propósito e gerar impacto real, em qualquer rotina.
                 </p>
 
                 <ul className="space-y-3 mb-8">
@@ -291,7 +291,7 @@ const Index = () => {
                     "Acesso imediato após a compra",
                     "Leitura objetiva, sem enrolação",
                     "Aplicação simples e repetível na sua rotina",
-                    "Pagamento único — sem assinatura",
+                    "Pagamento único, sem assinatura",
                   ].map((t) => (
                     <li key={t} className="flex items-center gap-3 text-cream/90">
                       <Check className="h-5 w-5 text-accent flex-shrink-0" /> {t}
@@ -331,10 +331,10 @@ const Index = () => {
 
           <Accordion type="single" collapsible className="space-y-3">
             {[
-              { q: "Isso é para mim?", a: "Se você sente que tem potencial, ideias e clareza — mas não consegue colocar em prática de forma constante — sim, foi feito para você. Não importa sua área, sua idade ou o tamanho do projeto." },
+              { q: "Isso é para mim?", a: "Se você sente que tem potencial, ideias e clareza, mas não consegue colocar em prática de forma constante, sim, foi feito para você. Não importa sua área, sua idade ou o tamanho do projeto." },
               { q: "Funciona se eu estiver travado há muito tempo?", a: "Sim. O manual existe justamente para quem já tentou começar várias vezes. O foco é destravar o ciclo, não exigir que você se torne uma pessoa diferente." },
               { q: "É prático ou teórico?", a: "Direto e prático. Cada parte termina com algo que você consegue aplicar imediatamente, sem precisar parar tudo e reorganizar a vida inteira." },
-              { q: "Vou conseguir aplicar com rotina corrida?", a: "Foi pensado exatamente para isso. A proposta é uma execução simples e repetível — não um sistema que exige horas livres que você não tem." },
+              { q: "Vou conseguir aplicar com rotina corrida?", a: "Foi pensado exatamente para isso. A proposta é uma execução simples e repetível, não um sistema que exige horas livres que você não tem." },
               { q: "Como recebo o acesso?", a: "Assim que o pagamento é confirmado, o acesso é liberado imediatamente no seu e-mail. É só abrir e começar." },
               { q: "É um pagamento único?", a: "Sim. Você paga R$ 19,97 uma única vez e tem acesso ao material. Sem mensalidade, sem cobrança recorrente." },
             ].map(({ q, a }, i) => (
@@ -360,7 +360,7 @@ const Index = () => {
             Daqui a um ano, você vai querer ter começado <span className="italic text-accent">hoje</span>.
           </h2>
           <p className="text-lg md:text-xl text-cream/85 leading-relaxed text-balance mb-10 max-w-2xl mx-auto">
-            Você já sabe o que precisa fazer. O Manual do Insight à Ação é a ponte entre saber e fazer — e ela começa no momento em que você decide atravessar.
+            Você já sabe o que precisa fazer. O Manual do Insight à Ação é a ponte entre saber e fazer. E ela começa no momento em que você decide atravessar.
           </p>
           <CTAButton>Começar agora por R$ 19,97</CTAButton>
           <p className="mt-6 text-sm text-cream/60">Acesso imediato • Pagamento único • Compra segura</p>
@@ -371,7 +371,7 @@ const Index = () => {
       <footer className="bg-bordeaux-deep text-cream/60 py-10">
         <div className="max-w-6xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
           <p className="font-serif text-lg text-cream">Manual do Insight à Ação</p>
-          <p>© {new Date().getFullYear()} — Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()}. Todos os direitos reservados.</p>
         </div>
       </footer>
     </main>
