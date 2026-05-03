@@ -1,5 +1,5 @@
 User-agent: Googlebot
-Allow: /
+Allow: /google-site-verification=V7hmKEq0n8dGN1PDo2alc-AE1zzMnEx3kY7XbQtr2o8
 
 User-agent: Bingbot
 Allow: /
