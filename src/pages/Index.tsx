@@ -35,12 +35,12 @@ const Index = () => {
         <div className="relative max-w-7xl mx-auto px-6 lg:px-12 pt-20 pb-24 md:pt-28 md:pb-32">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="animate-fade-up">
-              <SectionLabel>Manual do Insight à Ação</SectionLabel>
+              <SectionLabel>Edição Premium • Manual do Insight à Ação</SectionLabel>
               <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-balance mb-6">
-                Saia da paralisia e comece a agir com <span className="italic text-accent">clareza</span> em poucos dias.
+                Pense com clareza. Decida com precisão. <span className="italic text-accent">Aja com propósito.</span>
               </h1>
               <p className="text-lg md:text-xl text-foreground/75 mb-8 leading-relaxed max-w-xl">
-                Um método simples para destravar decisões, acabar com a procrastinação e transformar insights em ação real, mesmo que você esteja travado há meses.
+                O manual definitivo para sair da paralisia, dominar seus próximos movimentos e transformar insights em resultados reais. Sem enrolação, sem teoria solta.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-10">
@@ -64,11 +64,11 @@ const Index = () => {
             </div>
 
             <div className="relative animate-fade-in lg:justify-self-end">
-              <div className="absolute -inset-10 bg-gradient-to-tr from-terracotta/40 to-accent/30 blur-3xl rounded-full" />
+              <div className="absolute -inset-16 bg-gradient-to-tr from-gold/30 via-accent/20 to-transparent blur-3xl rounded-full" />
               <img
                 src={cover}
-                alt="Capa do Manual do Insight à Ação"
-                className="relative w-full max-w-md mx-auto rounded-lg shadow-elegant rotate-[-2deg] hover:rotate-0 transition-transform duration-700"
+                alt="Capa premium do Manual do Insight à Ação"
+                className="relative w-full max-w-md mx-auto drop-shadow-[0_40px_60px_rgba(0,0,0,0.85)] rotate-[-2deg] hover:rotate-0 transition-transform duration-700"
                 loading="eager"
               />
             </div>
@@ -341,7 +341,7 @@ const Index = () => {
               </div>
 
               <div className="hidden md:block">
-                <img src={cover} alt="Manual do Insight à Ação" className="w-64 rounded-md shadow-elegant rotate-3" />
+                <img src={cover} alt="Manual do Insight à Ação" className="w-64 drop-shadow-[0_30px_40px_rgba(0,0,0,0.75)] rotate-3" />
               </div>
             </div>
           </div>
