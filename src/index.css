@@ -6,57 +6,59 @@
 
 @layer base {
   :root {
-    /* Base — cream / off-white editorial */
-    --background: 36 38% 96%;
-    --foreground: 20 25% 12%;
+    /* Base — dark premium */
+    --background: 224 38% 5%;
+    --foreground: 36 30% 96%;
 
-    --card: 36 40% 98%;
-    --card-foreground: 20 25% 12%;
+    --card: 225 32% 9%;
+    --card-foreground: 36 30% 96%;
 
-    --popover: 36 40% 98%;
-    --popover-foreground: 20 25% 12%;
+    --popover: 225 32% 9%;
+    --popover-foreground: 36 30% 96%;
 
-    /* Primary — bordô profundo */
-    --primary: 357 45% 22%;
-    --primary-foreground: 36 40% 96%;
+    /* Primary — vibrant amber/orange (transformação) */
+    --primary: 28 95% 58%;
+    --primary-foreground: 224 38% 5%;
 
-    /* Secondary — terracota */
-    --secondary: 14 55% 42%;
-    --secondary-foreground: 36 40% 96%;
+    /* Secondary — deep wine accent */
+    --secondary: 14 70% 50%;
+    --secondary-foreground: 36 30% 96%;
 
-    --muted: 33 25% 90%;
-    --muted-foreground: 20 15% 38%;
+    --muted: 224 20% 14%;
+    --muted-foreground: 30 12% 68%;
 
-    /* Accent — dourado quente */
-    --accent: 36 55% 55%;
-    --accent-foreground: 20 25% 12%;
+    /* Accent — gold */
+    --accent: 38 90% 60%;
+    --accent-foreground: 224 38% 5%;
 
-    --destructive: 0 70% 45%;
-    --destructive-foreground: 36 40% 96%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 36 30% 96%;
 
-    --border: 30 20% 85%;
-    --input: 30 20% 85%;
-    --ring: 357 45% 22%;
+    --border: 224 20% 18%;
+    --input: 224 20% 18%;
+    --ring: 28 95% 58%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --bordeaux: 357 50% 18%;
-    --bordeaux-deep: 357 55% 12%;
-    --terracotta: 14 55% 42%;
-    --terracotta-light: 18 60% 55%;
-    --cream: 36 38% 96%;
-    --cream-deep: 33 35% 92%;
-    --gold: 38 60% 58%;
+    --bordeaux: 224 40% 8%;
+    --bordeaux-deep: 224 50% 4%;
+    --terracotta: 18 90% 55%;
+    --terracotta-light: 32 95% 62%;
+    --cream: 36 30% 96%;
+    --cream-deep: 224 25% 12%;
+    --gold: 42 95% 62%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(var(--bordeaux-deep)) 0%, hsl(var(--bordeaux)) 55%, hsl(var(--terracotta)) 100%);
+    --gradient-hero: radial-gradient(ellipse at top, hsl(28 80% 18% / 0.5) 0%, transparent 60%), linear-gradient(180deg, hsl(var(--bordeaux-deep)) 0%, hsl(var(--bordeaux)) 100%);
     --gradient-cta: linear-gradient(135deg, hsl(var(--terracotta)) 0%, hsl(var(--terracotta-light)) 100%);
-    --gradient-cream: linear-gradient(180deg, hsl(var(--cream)) 0%, hsl(var(--cream-deep)) 100%);
-    --gradient-divider: linear-gradient(90deg, transparent, hsl(var(--gold) / 0.6), transparent);
+    --gradient-cream: linear-gradient(180deg, hsl(224 35% 6%) 0%, hsl(224 40% 8%) 100%);
+    --gradient-divider: linear-gradient(90deg, transparent, hsl(var(--gold) / 0.7), transparent);
+    --gradient-text: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--terracotta-light)) 100%);
 
-    --shadow-elegant: 0 30px 60px -20px hsl(var(--bordeaux) / 0.35);
-    --shadow-cta: 0 15px 35px -10px hsl(var(--terracotta) / 0.55);
-    --shadow-soft: 0 10px 30px -15px hsl(20 25% 12% / 0.15);
+    --shadow-elegant: 0 30px 80px -20px hsl(var(--terracotta) / 0.35);
+    --shadow-cta: 0 20px 50px -10px hsl(var(--terracotta) / 0.6);
+    --shadow-soft: 0 10px 30px -15px hsl(0 0% 0% / 0.5);
+    --shadow-glow: 0 0 80px hsl(var(--terracotta) / 0.3);
 
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
