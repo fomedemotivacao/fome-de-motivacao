@@ -1,7 +1,14 @@
 import { Link } from "react-router-dom";
-import { Instagram } from "lucide-react";
 
 const CHECKOUT_URL = "https://pay.kiwify.com.br/9h8nNa3";
+
+const InstagramIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+  </svg>
+);
 
 const TikTokIcon = ({ className = "" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
@@ -22,14 +29,14 @@ const FacebookIcon = ({ className = "" }: { className?: string }) => (
 );
 
 const socials = [
-  { label: "Instagram", href: "https://instagram.com", Icon: Instagram },
-  { label: "TikTok", href: "https://tiktok.com", Icon: TikTokIcon },
-  { label: "X (Twitter)", href: "https://x.com", Icon: XIcon },
-  { label: "Facebook", href: "https://facebook.com", Icon: FacebookIcon },
+  { label: "Instagram", href: "https://www.instagram.com/fomedemotivacao", Icon: InstagramIcon },
+  { label: "TikTok", href: "https://www.tiktok.com/@fomedemotivacao", Icon: TikTokIcon },
+  { label: "X (Twitter)", href: "https://x.com/fomedemotivacao", Icon: XIcon },
+  { label: "Facebook", href: "https://www.facebook.com/fomedemotivacao", Icon: FacebookIcon },
 ];
 
 const SiteFooter = () => (
-  <footer className="bg-bordeaux-deep border-t border-border">
+  <footer className="border-t border-border bg-background">
     <div className="max-w-6xl mx-auto px-6 lg:px-12 py-14">
       <div className="grid gap-10 md:grid-cols-3">
         <div>

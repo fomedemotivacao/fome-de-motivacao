@@ -22,13 +22,12 @@ const SiteHeader = () => {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => setOpen(false), [pathname]);
 
-  // No topo (hero escuro) os textos precisam ser claros
   const navLinkClass = scrolled
     ? "text-sm text-foreground/70 hover:text-accent transition-colors font-medium"
     : "text-sm text-white/80 hover:text-white transition-colors font-medium";
@@ -41,7 +40,7 @@ const SiteHeader = () => {
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-background/85 backdrop-blur-xl border-b border-border shadow-soft"
+          ? "bg-background/90 backdrop-blur-xl border-b border-border shadow-sm"
           : "bg-transparent"
       }`}
     >
@@ -50,7 +49,7 @@ const SiteHeader = () => {
         className="max-w-7xl mx-auto px-6 lg:px-12 h-16 md:h-20 flex items-center justify-between"
       >
         <Link to="/" className={logoClass}>
-          Manual do <span className="italic text-accent">Insight à Ação</span>
+          Manual do{" "}<span className="italic text-accent">Insight à Ação</span>
         </Link>
 
         <ul className="hidden lg:flex items-center gap-8">
@@ -83,7 +82,7 @@ const SiteHeader = () => {
       </nav>
 
       {open && (
-        <div className="lg:hidden bg-background/97 backdrop-blur-xl border-t border-border">
+        <div className="lg:hidden bg-background border-t border-border">
           <ul className="px-6 py-4 space-y-1">
             {links.map((l) => (
               <li key={l.label}>
@@ -96,12 +95,7 @@ const SiteHeader = () => {
               </li>
             ))}
             <li className="pt-4">
-              <a
-                href={CHECKOUT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block"
-              >
+              <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer" className="block">
                 <Button className="w-full bg-gradient-cta text-primary-foreground font-bold rounded-full py-6 shadow-cta">
                   Quero destravar minha vida agora
                 </Button>
