@@ -9,6 +9,7 @@ export interface Post {
   tags: string[];
   wordCount?: number;
   offerEbook?: boolean; // controle de frequência: a cada 3 artigos
+  image?: string; // caminho relativo (ex: /og/slug) ou URL absoluta
   content: string[]; // parágrafos e subtítulos (prefixo "## " vira h2)
 }
 
@@ -20,6 +21,7 @@ export interface Post {
 // offerEbook: true apenas a cada 3 artigos (artigos 3, 6, 9...).
 // Variáveis dinâmicas disponíveis nos metadados de cada post:
 //   tema_desc, angulo, sensacao, palavra_chave, contador_artigo, oferecer_ebook
+// image: usar "/og/<slug>" para OG image dinâmica (gerada pelo Cloudflare Pages Function)
 
 export const posts: Post[] = [
   {
@@ -33,6 +35,7 @@ export const posts: Post[] = [
     tags: ["paralisia por análise", "tomada de decisão", "produtividade", "execução", "clareza mental"],
     wordCount: 1380,
     offerEbook: false,
+    image: "/og/paralisia-por-analise-como-sair",
     content: [
       "Existe uma diferença entre pensar sobre um problema e viver dentro dele. Quando você passa horas pesquisando a mesma decisão, compara possibilidades que já comparou antes e sente que nunca sabe o suficiente para agir, provavelmente não está faltando informação. Está faltando um critério claro para parar de buscar e começar a mover.",
       "Paralisia por análise não é falta de inteligência. Em muitos casos, é justamente o contrário: pessoas que pensam com profundidade tendem a enxergar mais variáveis, mais riscos e mais cenários possíveis. O problema não é a capacidade de análise em si. O problema surge quando essa capacidade é usada indefinidamente, sem um ponto de chegada definido.",
@@ -73,6 +76,7 @@ export const posts: Post[] = [
     tags: ["motivação", "sistemas", "hábitos", "disciplina", "consistência"],
     wordCount: 1350,
     offerEbook: false,
+    image: "/og/motivacao-sistemas-disciplina",
     content: [
       "Motivação aparece. Motivação vai embora. Isso não é problema de caráter, é biologia. O estado motivado é resultado de uma combinação de fatores, como novidade, recompensa esperada, sono adequado, ausência de estresse agudo, e a maioria desses fatores não está sob controle direto no momento em que você precisa deles.",
       "O problema não é depender de motivação para iniciar algo. O problema é depender dela para continuar. Quem estrutura a execução em cima de um estado emocional variável vai produzir em picos e desaparecer nos vales. E os vales são inevitáveis.",
@@ -113,6 +117,7 @@ export const posts: Post[] = [
     tags: ["clareza mental", "rotina", "prioridades", "produtividade", "organização"],
     wordCount: 1290,
     offerEbook: true,
+    image: "/og/clareza-mental-rotina-e-decisoes",
     content: [
       "Algumas pessoas parecem pensar com mais nitidez do que outras. Elas identificam o que importa com mais rapidez, tomam decisões com menos hesitação e saem das conversas sabendo o que precisam fazer. É tentador atribuir isso a um talento natural, a uma personalidade especialmente organizada ou a uma inteligência fora do comum.",
       "Na maioria dos casos, não é nenhum desses fatores. É prática. Clareza mental, entendida como a capacidade de saber o que importa e o que fazer a seguir, não é um estado que algumas pessoas têm e outras não. É o resultado de hábitos específicos aplicados com consistência.",
@@ -152,6 +157,7 @@ export const posts: Post[] = [
     tags: ["insight", "execução", "ideias", "próximos passos", "produtividade"],
     wordCount: 1320,
     offerEbook: false,
+    image: "/og/por-que-boas-ideias-morrem",
     content: [
       "Um insight é um momento de conexão, quando algo que antes estava fragmentado encontra uma forma. Pode ser uma solução para um problema que você carrega há semanas, uma direção para um projeto que estava emperrado, ou uma percepção sobre um padrão da sua própria vida. Por alguns minutos, a clareza é total.",
       "Então o dia continua. Outras demandas aparecem. A clareza se dissolve. Dias depois, o insight retorna apenas como uma lembrança vaga: eu já tinha pensado nisso. A oportunidade passou sem se transformar em nada.",
@@ -192,6 +198,7 @@ export const posts: Post[] = [
     tags: ["disciplina", "consistência", "hábitos", "mentalidade", "autocrítica"],
     wordCount: 1310,
     offerEbook: false,
+    image: "/og/disciplina-nos-dias-ruins",
     content: [
       "Existe uma versão de disciplina que parece quase mágica de fora. A pessoa acorda cedo todos os dias, treina antes do trabalho, mantém os hábitos sem falhar, produz com consistência e ainda tem energia sobrando. Essa versão existe em algumas pessoas em alguns períodos da vida. Mas não é assim que disciplina funciona para a maioria das pessoas na maioria do tempo.",
       "Disciplina real é mais silenciosa e mais difícil do que parece nas histórias de sucesso. Ela inclui dias em que você faz menos do que planejou. Inclui semanas em que um hábito falhou. Inclui períodos em que o progresso é quase invisível. O que define não é a ausência de queda, mas o que acontece depois dela.",
@@ -228,37 +235,4 @@ export const posts: Post[] = [
     readingTime: "9 min",
     category: "Produtividade",
     tags: ["metas", "objetivos", "planejamento", "comportamento", "revisão semanal"],
-    wordCount: 1340,
-    offerEbook: true,
-    content: [
-      "Todo começo de ano, toda segunda-feira, todo dia primeiro do mês: há um padrão recorrente de definição de metas seguido de abandono silencioso semanas depois. Isso acontece com tanta regularidade que passou a ser tratado quase com humor. 'Resoluções de ano novo não duram.' 'Motivação de janeiro.' Como se a falha fosse inevitável.",
-      "Mas o problema raramente está na meta em si. Está na ausência de uma estrutura que conecte a meta ao comportamento diário real. Uma meta sem comportamento definido é uma intenção. E intenção, por mais sincera que seja, não produz resultado por conta própria.",
-      "## O que uma meta precisa ter",
-      "Uma meta útil descreve um resultado e um comportamento. O resultado é o destino: o que você quer alcançar. O comportamento é o caminho: o que você vai fazer repetidamente para chegar lá.",
-      "A maioria das metas para no resultado. 'Perder 10 quilos.' 'Dobrar a renda.' 'Escrever um livro.' Esses são resultados, não metas operacionais. Eles descrevem onde você quer chegar, mas não contêm nenhuma instrução sobre o que fazer na terça-feira à tarde.",
-      "A transformação necessária é conectar o resultado a uma frequência de comportamento: quantas vezes por semana, por quanto tempo, de que forma específica. É isso que você controla. O resultado é consequência do comportamento repetido ao longo do tempo, não algo que você decide ter.",
-      "## Uma meta por área, no máximo",
-      "Existe uma tendência de definir metas em várias áreas ao mesmo tempo, como se o início de um ciclo fosse o momento certo para transformar tudo simultaneamente. Saúde, carreira, relacionamentos, finanças, aprendizado, lá estão, todos em uma lista.",
-      "O problema não é ter objetivos em várias áreas. O problema é tentar mover todas elas com a mesma intensidade ao mesmo tempo. Energia e atenção são recursos finitos. Quando distribuídos em demasia, nenhuma frente recebe o suficiente para gerar tração real.",
-      "Uma abordagem mais realista é escolher uma meta prioritária por área e aceitar que o resto ficará em manutenção por um período. Não em abandono, em manutenção. A diferença é que a manutenção tem um comportamento mínimo definido, enquanto o abandono não tem nenhum.",
-      "Concentrar esforço em uma frente por vez não acelera apenas os resultados naquela frente. Também libera atenção cognitiva que, quando dividida entre muitos objetivos, fica parcialmente consumida pela culpa de não estar avançando em todos.",
-      "## O papel da revisão semanal",
-      "Uma meta definida sem revisão regular tende a se tornar um item na lista que você olha com desconforto crescente e age cada vez menos. O distanciamento se acumula silenciosamente.",
-      "Uma revisão semanal curta, de 15 a 20 minutos, faz algo simples e poderoso: ela mantém a meta presente na atenção consciente. Quando algo está presente na atenção, tem mais probabilidade de influenciar as decisões do dia.",
-      "A revisão não precisa ser elaborada. Três perguntas são suficientes: o que foi feito essa semana em direção a essa meta? O que impediu o que não foi feito? O que será diferente na semana que vem?",
-      "A terceira pergunta é a mais importante. Ela distingue revisão de avaliação. Avaliar o passado sem definir ajuste é um exercício de culpa sem utilidade. Ajustar o plano com base no que foi aprendido é usar o passado para melhorar o futuro.",
-      "## Quando a meta precisa ser revisada, não apenas o plano",
-      "Existe um ponto em que a honestidade exige uma pergunta diferente: a meta ainda faz sentido para você? Não para quem você era quando a definiu, não para quem os outros esperam que você seja. Para você agora.",
-      "Metas mudam porque as pessoas mudam. Mudam porque a realidade revela informações que não estavam disponíveis no momento da definição. Mudam porque o que parecia importante de longe parece diferente de perto.",
-      "Revisar uma meta não é desistir. É manter o alinhamento entre o que você está construindo e o que você genuinamente quer construir. Persistir em uma direção que deixou de fazer sentido não é disciplina. É rigidez disfarçada de compromisso.",
-      "A pergunta que ajuda a distinguir os dois casos é: você está mantendo essa meta porque acredita nela ou porque desistir parece admissão de fracasso? Essas são motivações diferentes e levam a comportamentos diferentes ao longo do tempo.",
-      "## O que separa intenção de resultado",
-      "No final, o que separa quem alcança o que pretende de quem não alcança raramente é o tamanho da ambição ou a intensidade da motivação inicial. É a presença de uma estrutura que mantém o comportamento certo conectado ao objetivo certo, revisado com frequência suficiente para ajustar o que precisa ser ajustado.",
-      "Isso não é glamoroso. Não é a história de uma virada súbita ou de uma determinação extraordinária. É um processo ordinário aplicado com consistência suficiente para que o acúmulo se torne visível.",
-      "Menos metas, comportamento mais claro, revisão honesta. Esses três elementos, juntos, transformam intenção em progresso real. Não de forma garantida, mas com muito mais frequência do que uma lista de resoluções sem estrutura jamais conseguiu.",
-      "Se esta reflexão fez você perceber que precisa transformar algumas ideias em decisões práticas, o ebook 'Do Insight à Ação' pode ser um próximo passo para aprofundar esse processo.",
-    ],
-  },
-];
-
-export const getPost = (slug?: string) => posts.find((p) => p.slug === slug);
+ 
