@@ -65,6 +65,8 @@ function slugificar(texto) {
 // CHAMAR OpenRouter
 // ─────────────────────────────────────────
 async function gerarComIA(promptSistema, promptUsuario) {
+  console.log(`🤖 Modelo: ${MODEL}`);
+
   const resp = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -186,7 +188,6 @@ async function main() {
 
   console.log(`📝 Gerando post #${contador}: ${temaObj.tema}`);
   console.log(`📌 Slug: ${slug}`);
-  console.log(`🤖 Modelo: ${MODEL}`);
 
   // Ler o prompt mestre diretamente do arquivo
   const promptMestreRaw = fs.readFileSync('src/data/prompt-mestre.ts', 'utf8');
