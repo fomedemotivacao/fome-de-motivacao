@@ -11,7 +11,7 @@ import path from 'path';
 
 const POSTS_PATH = path.resolve('src/data/posts.ts');
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MODEL = 'mistralai/mistral-7b-instruct'; // troque pelo modelo que preferir
+const MODEL = 'mistralai/mistral-small'; // modelo estável e gratuito no OpenRouter
 
 // ─────────────────────────────────────────
 // BANCO DE TEMAS — rotação automática
