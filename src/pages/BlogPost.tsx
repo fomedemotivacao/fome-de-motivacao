@@ -19,6 +19,8 @@ const BlogPost = () => {
   if (!post) return <Navigate to="/blog" replace />;
 
   const related = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
+  const postUrl = `${SITE_URL}/blog/${post.slug}`;
+  const effectiveModified = post.modifiedDate ?? post.date;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -28,41 +30,86 @@ const BlogPost = () => {
         path={`/blog/${post.slug}`}
         type="article"
         publishedTime={post.date}
-        keywords={`${post.category.toLowerCase()}, motivação, produtividade, clareza mental, execução`}
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          "@id": `${SITE_URL}/blog/${post.slug}`,
-          headline: post.title,
-          description: post.description,
-          datePublished: post.date,
-          dateModified: post.date,
-          inLanguage: "pt-BR",
-          url: `${SITE_URL}/blog/${post.slug}`,
-          articleSection: post.category,
-          mainEntityOfPage: {
-            "@type": "WebPage",
-            "@id": `${SITE_URL}/blog/${post.slug}`,
+        modifiedTime={effectiveModified}
+        keywords={[
+          post.category.toLowerCase(),
+          ...post.tags,
+          "motivação",
+          "produtividade",
+          "clareza mental",
+        ].join(", ")}
+        tags={post.tags}
+        section={post.category}
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: SITE_URL,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Blog",
+                item: `${SITE_URL}/blog`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: post.title,
+                item: postUrl,
+              },
+            ],
           },
-          author: {
-            "@type": "Organization",
-            name: "Manual do Insight à Ação",
-            url: SITE_URL,
-          },
-          publisher: {
-            "@type": "Organization",
-            name: "Manual do Insight à Ação",
-            url: SITE_URL,
-            logo: {
+          {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "@id": postUrl,
+            headline: post.title,
+            description: post.description,
+            datePublished: post.date,
+            dateModified: effectiveModified,
+            inLanguage: "pt-BR",
+            url: postUrl,
+            articleSection: post.category,
+            keywords: post.tags.join(", "),
+            ...(post.wordCount ? { wordCount: post.wordCount } : {}),
+            image: {
               "@type": "ImageObject",
               url: `${SITE_URL}/og-image.jpg`,
+              width: 1200,
+              height: 630,
+            },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": postUrl,
+            },
+            author: {
+              "@type": "Organization",
+              name: "Manual do Insight à Ação",
+              url: SITE_URL,
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "Manual do Insight à Ação",
+              url: SITE_URL,
+              logo: {
+                "@type": "ImageObject",
+                url: `${SITE_URL}/og-image.jpg`,
+                width: 1200,
+                height: 630,
+              },
+            },
+            isPartOf: {
+              "@type": "Blog",
+              "@id": `${SITE_URL}/blog`,
             },
           },
-          isPartOf: {
-            "@type": "Blog",
-            "@id": `${SITE_URL}/blog`,
-          },
-        }}
+        ] as unknown as Record<string, unknown>}
       />
       <SiteHeader />
 
@@ -82,6 +129,19 @@ const BlogPost = () => {
                 <Clock className="h-3.5 w-3.5" aria-hidden="true" />{post.readingTime} de leitura
               </span>
             </div>
+            {/* Tags visíveis para leitores e para rastreadores */}
+            {post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-5" aria-label="Tags do artigo">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs px-2.5 py-1 rounded-full border border-border text-muted-foreground"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
             <div className="gold-divider mt-10" />
           </header>
 
