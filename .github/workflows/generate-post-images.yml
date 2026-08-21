@@ -1,13 +1,11 @@
-name: 🖼️ Generate Post Images (Unsplash)
+name: 🗨️🖴 Generate Post Images (OpenRouter + Unsplash)
 
 on:
-  # Roda automaticamente quando posts.ts for alterado
   push:
     branches: [main]
     paths:
       - 'src/data/posts.ts'
 
-  # Permite disparar manualmente pelo GitHub
   workflow_dispatch:
     inputs:
       force_all:
@@ -25,10 +23,10 @@ on:
 
 jobs:
   generate-images:
-    name: Fetch & Save Post Images
+    name: Generate Queries (OpenRouter) + Fetch Images (Unsplash)
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # necessário para fazer commit das imagens
+      contents: write
 
     steps:
       - name: ⬇️ Checkout do repositório
@@ -40,25 +38,22 @@ jobs:
           node-version: '20'
 
       - name: 📦 Instalar dependências do script
-        run: |
-          npm install node-fetch@3 tsx --no-save
+        run: npm install node-fetch@3 --no-save
 
       - name: 🔍 Extrair slugs e tags dos posts
-        id: extract
         run: |
           node --input-type=module <<'EOF'
           import { readFileSync, writeFileSync } from 'fs';
           const raw = readFileSync('src/data/posts.ts', 'utf-8');
 
-          // Extrair todos os posts como objetos simples via regex
-          const slugMatches = [...raw.matchAll(/slug:\s*"([^"]+)"/g)];
-          const titleMatches = [...raw.matchAll(/title:\s*"([^"]+)"/g)];
-          const tagsMatches = [...raw.matchAll(/tags:\s*\[([^\]]+)\]/g)];
+          const slugMatches    = [...raw.matchAll(/slug:\s*"([^"]+)"/g)];
+          const titleMatches   = [...raw.matchAll(/title:\s*"([^"]+)"/g)];
+          const tagsMatches    = [...raw.matchAll(/tags:\s*\[([^\]]+)\]/g)];
           const categoryMatches = [...raw.matchAll(/category:\s*"([^"]+)"/g)];
 
           const posts = slugMatches.map((m, i) => ({
-            slug: m[1],
-            title: titleMatches[i]?.[1] || m[1],
+            slug:     m[1],
+            title:    titleMatches[i]?.[1]   || m[1],
             category: categoryMatches[i]?.[1] || '',
             tags: (tagsMatches[i]?.[1] || '')
               .split(',')
@@ -72,11 +67,12 @@ jobs:
           posts.forEach(p => console.log(` - ${p.slug}`));
           EOF
 
-      - name: 🖼️ Buscar imagens no Unsplash e salvar em public/images/posts/
+      - name: 🤖🔍 Gerar queries (OpenRouter) + Buscar imagens (Unsplash)
         env:
-          UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
-          FORCE_ALL: ${{ github.event.inputs.force_all || 'false' }}
-          SPECIFIC_SLUG: ${{ github.event.inputs.specific_slug || '' }}
+          UNSPLASH_API_KEY:   ${{ secrets.UNSPLASH_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          FORCE_ALL:          ${{ github.event.inputs.force_all || 'false' }}
+          SPECIFIC_SLUG:      ${{ github.event.inputs.specific_slug || '' }}
         run: node .github/scripts/fetch-unsplash-images.mjs
 
       - name: 📊 Verificar imagens geradas
@@ -88,7 +84,7 @@ jobs:
       - name: 💾 Commit e push das imagens geradas
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: update blog post images from Unsplash [skip ci]"
+          commit_message: "chore: update blog post images [skip ci]"
           file_pattern: "public/images/posts/*.jpg public/images/posts/*.json"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
