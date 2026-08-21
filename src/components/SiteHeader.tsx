@@ -28,24 +28,35 @@ const SiteHeader = () => {
 
   useEffect(() => setOpen(false), [pathname]);
 
+  // No topo (hero escuro) os textos precisam ser claros
+  const navLinkClass = scrolled
+    ? "text-sm text-foreground/70 hover:text-accent transition-colors font-medium"
+    : "text-sm text-white/80 hover:text-white transition-colors font-medium";
+
+  const logoClass = scrolled
+    ? "font-serif text-lg md:text-xl text-foreground hover:text-accent transition-colors"
+    : "font-serif text-lg md:text-xl text-white hover:text-white/80 transition-colors";
+
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border shadow-soft" : "bg-transparent"
+        scrolled
+          ? "bg-background/85 backdrop-blur-xl border-b border-border shadow-soft"
+          : "bg-transparent"
       }`}
     >
-      <nav aria-label="Navegação principal" className="max-w-7xl mx-auto px-6 lg:px-12 h-16 md:h-20 flex items-center justify-between">
-        <Link to="/" className="font-serif text-lg md:text-xl text-foreground hover:text-accent transition-colors">
+      <nav
+        aria-label="Navegação principal"
+        className="max-w-7xl mx-auto px-6 lg:px-12 h-16 md:h-20 flex items-center justify-between"
+      >
+        <Link to="/" className={logoClass}>
           Manual do <span className="italic text-accent">Insight à Ação</span>
         </Link>
 
         <ul className="hidden lg:flex items-center gap-8">
           {links.map((l) => (
             <li key={l.label}>
-              <Link
-                to={`${l.to}${l.hash}`}
-                className="text-sm text-foreground/70 hover:text-accent transition-colors font-medium"
-              >
+              <Link to={`${l.to}${l.hash}`} className={navLinkClass}>
                 {l.label}
               </Link>
             </li>
@@ -65,7 +76,7 @@ const SiteHeader = () => {
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Fechar menu" : "Abrir menu"}
           aria-expanded={open}
-          className="lg:hidden text-foreground p-2 -mr-2"
+          className={`lg:hidden p-2 -mr-2 ${scrolled ? "text-foreground" : "text-white"}`}
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
@@ -85,7 +96,12 @@ const SiteHeader = () => {
               </li>
             ))}
             <li className="pt-4">
-              <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer" className="block">
+              <a
+                href={CHECKOUT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
                 <Button className="w-full bg-gradient-cta text-primary-foreground font-bold rounded-full py-6 shadow-cta">
                   Quero destravar minha vida agora
                 </Button>
