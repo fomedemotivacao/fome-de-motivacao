@@ -1,7 +1,6 @@
 {
   // Cloudflare Pages configuration
   "name": "insight-to-action-page",
-  "compatibility_date": "2025-09-24",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2024-09-23",
   "pages_build_output_dir": "dist"
 }
