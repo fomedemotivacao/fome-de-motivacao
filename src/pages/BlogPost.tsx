@@ -21,6 +21,7 @@ const BlogPost = () => {
   const related = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
   const postUrl = `${SITE_URL}/blog/${post.slug}`;
   const effectiveModified = post.modifiedDate ?? post.date;
+  const coverImage = `/images/posts/${post.slug}.jpg`;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -80,7 +81,7 @@ const BlogPost = () => {
             ...(post.wordCount ? { wordCount: post.wordCount } : {}),
             image: {
               "@type": "ImageObject",
-              url: `${SITE_URL}/og-image.jpg`,
+              url: `${SITE_URL}/images/posts/${post.slug}.jpg`,
               width: 1200,
               height: 630,
             },
@@ -129,7 +130,7 @@ const BlogPost = () => {
                 <Clock className="h-3.5 w-3.5" aria-hidden="true" />{post.readingTime} de leitura
               </span>
             </div>
-            {/* Tags visíveis para leitores e para rastreadores */}
+            {/* Tags */}
             {post.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-5" aria-label="Tags do artigo">
                 {post.tags.map((tag) => (
@@ -144,6 +145,25 @@ const BlogPost = () => {
             )}
             <div className="gold-divider mt-10" />
           </header>
+
+          {/* Imagem de capa do post */}
+          <div className="max-w-3xl mx-auto px-6 lg:px-12 mb-10">
+            <div className="rounded-2xl overflow-hidden aspect-[1200/630] bg-gradient-to-br from-accent/10 to-accent/5">
+              <img
+                src={coverImage}
+                alt={`Imagem de capa: ${post.title}`}
+                width={1200}
+                height={630}
+                loading="eager"
+                decoding="async"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const t = e.currentTarget;
+                  t.style.display = "none";
+                }}
+              />
+            </div>
+          </div>
 
           <div className="max-w-3xl mx-auto px-6 lg:px-12 space-y-6">
             {post.content.map((block, i) =>
@@ -178,10 +198,24 @@ const BlogPost = () => {
                 <Link
                   key={p.slug}
                   to={`/blog/${p.slug}`}
-                  className="rounded-2xl border border-border bg-card p-6 shadow-soft transition-all hover:-translate-y-1 hover:border-accent/50"
+                  className="group rounded-2xl border border-border bg-card shadow-soft overflow-hidden transition-all hover:-translate-y-1 hover:border-accent/50"
                 >
-                  <span className="text-xs uppercase tracking-[0.2em] text-accent font-semibold">{p.category}</span>
-                  <h3 className="font-serif text-xl mt-3 leading-snug">{p.title}</h3>
+                  <div className="relative overflow-hidden h-36 bg-gradient-to-br from-accent/10 to-accent/5">
+                    <img
+                      src={`/images/posts/${p.slug}.jpg`}
+                      alt={p.title}
+                      width={600}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => { e.currentTarget.style.display = "none"; }}
+                    />
+                  </div>
+                  <div className="p-6">
+                    <span className="text-xs uppercase tracking-[0.2em] text-accent font-semibold">{p.category}</span>
+                    <h3 className="font-serif text-xl mt-3 leading-snug">{p.title}</h3>
+                  </div>
                 </Link>
               ))}
             </div>
