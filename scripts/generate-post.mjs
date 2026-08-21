@@ -1,24 +1,24 @@
 /**
  * generate-post.mjs
- * Gera um novo post para o Fome de Motivação usando a API da OpenAI
- * e faz commit direto em src/data/posts.ts via GitHub API.
+ * Gera um novo post para o Fome de Motivação usando a API do OpenRouter
+ * e atualiza src/data/posts.ts com o novo artigo.
  *
  * Secrets necessários no repositório:
- *   OPENAI_API_KEY       — chave da OpenAI
+ *   OPENROUTER_API_KEY   — chave do OpenRouter
  *   GH_TOKEN             — GitHub token com permissão contents:write
  *
- * Variáveis de ambiente opcionais (podem ser passadas pelo workflow):
+ * Variáveis de ambiente opcionais (passadas pelo workflow):
  *   POST_TEMA            — tema do artigo (ex: "disciplina")
- *   POST_ANGULO          — ângulo editorial (ex: "como a disciplina supera motivação")
- *   POST_SENSACAO        — reflexão que o leitor deve levar (ex: "clareza sobre constância")
- *   POST_PALAVRA_CHAVE   — keyword SEO (ex: "disciplina e consistência")
+ *   POST_ANGULO          — ângulo editorial
+ *   POST_SENSACAO        — reflexão que o leitor deve levar
+ *   POST_PALAVRA_CHAVE   — keyword SEO
+ *   OPENROUTER_MODEL     — modelo a usar (padrão: google/gemini-flash-1.5)
  */
 
 import { readFileSync, writeFileSync } from 'fs';
-import { execSync } from 'child_process';
 import https from 'https';
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function slugify(text) {
   return text
@@ -27,27 +27,30 @@ function slugify(text) {
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
-    .replace(/[\s]+/g, '-')
+    .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .slice(0, 70);
 }
 
 function today() {
-  return new Date().toISOString().split('T')[0];
+  // Retorna data no fuso de Brasília (UTC-3)
+  const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+  return d.toISOString().split('T')[0];
 }
 
-function jsonPost(https_req_body) {
+function callOpenRouter(body) {
   return new Promise((resolve, reject) => {
-    const url = new URL('https://api.openai.com/v1/chat/completions');
-    const body = JSON.stringify(https_req_body);
+    const payload = JSON.stringify(body);
     const options = {
-      hostname: url.hostname,
-      path: url.pathname,
+      hostname: 'openrouter.ai',
+      path: '/api/v1/chat/completions',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Length': Buffer.byteLength(body),
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://fomedemotivacao.com.br',
+        'X-Title': 'Fome de Motivação',
+        'Content-Length': Buffer.byteLength(payload),
       },
     };
     const req = https.request(options, (res) => {
@@ -55,68 +58,107 @@ function jsonPost(https_req_body) {
       res.on('data', (chunk) => (data += chunk));
       res.on('end', () => {
         try { resolve(JSON.parse(data)); }
-        catch (e) { reject(new Error('Falha ao parsear resposta: ' + data)); }
+        catch (e) { reject(new Error('Falha ao parsear resposta OpenRouter: ' + data.slice(0, 500))); }
       });
     });
     req.on('error', reject);
-    req.write(body);
+    req.write(payload);
     req.end();
   });
 }
 
-// ─── Lê posts.ts atual e conta artigos ──────────────────────────────────────
+// ─── Banco de temas (40 temas variados para cobrir semanas sem repetição) ─────
+
+const TEMAS_BANCO = [
+  { tema: 'procrastinação', angulo: 'por que adiamos o que importa e o custo real disso', sensacao: 'clareza sobre o que estamos evitando', keyword: 'procrastinação como parar de adiar' },
+  { tema: 'autoconfiança', angulo: 'como ela se constrói na prática e não pelo pensamento positivo', sensacao: 'confiança vem de ação, não de espera', keyword: 'como desenvolver autoconfiança' },
+  { tema: 'medo do fracasso', angulo: 'por que o fracasso paralisa e como mudar a relação com ele', sensacao: 'menos medo de errar, mais disposição de tentar', keyword: 'medo de fracassar como superar' },
+  { tema: 'hábitos', angulo: 'por que mudar hábitos é difícil e o que realmente funciona', sensacao: 'perspectiva realista sobre mudança de comportamento', keyword: 'como criar hábitos consistentes' },
+  { tema: 'propósito', angulo: 'o mito de encontrar um propósito único e como construir sentido no dia a dia', sensacao: 'propósito pode ser construído, não apenas descoberto', keyword: 'como encontrar propósito de vida' },
+  { tema: 'comparação com outros', angulo: 'o efeito das redes sociais na autoimagem e como sair do ciclo de comparação', sensacao: 'menos competição interna, mais foco no próprio caminho', keyword: 'parar de se comparar com os outros' },
+  { tema: 'resiliência', angulo: 'o que ela é de verdade além do clichê motivacional', sensacao: 'resistir não significa ser invulnerável', keyword: 'como desenvolver resiliência' },
+  { tema: 'foco', angulo: 'por que estamos cada vez mais distraídos e o que fazer com isso', sensacao: 'foco é uma escolha que pode ser treinada', keyword: 'como melhorar o foco e concentração' },
+  { tema: 'disciplina', angulo: 'por que a disciplina sustenta resultados quando a motivação some', sensacao: 'consistência bate intensidade no longo prazo', keyword: 'disciplina e consistência para resultados' },
+  { tema: 'limites pessoais', angulo: 'por que dizer não é uma forma de respeito próprio', sensacao: 'impor limites não é egoísmo, é saúde', keyword: 'como impor limites pessoais' },
+  { tema: 'autoconhecimento', angulo: 'por que conhecer a si mesmo é o início de qualquer mudança real', sensacao: 'clareza sobre quem você é e o que te move', keyword: 'como desenvolver autoconhecimento' },
+  { tema: 'gestão do tempo', angulo: 'por que gerenciar energia importa mais do que gerenciar horas', sensacao: 'usar o tempo com mais intenção', keyword: 'como gerenciar o tempo de forma eficiente' },
+  { tema: 'motivação', angulo: 'por que a motivação some e o que sustenta a ação quando ela vai embora', sensacao: 'que motivação não é pré-requisito para agir', keyword: 'como manter a motivação' },
+  { tema: 'fracasso', angulo: 'o que os fracassos realmente ensinam e como transformá-los em aprendizado', sensacao: 'fracasso como parte do processo, não fim', keyword: 'aprender com o fracasso' },
+  { tema: 'gratidão', angulo: 'como a gratidão genuína difere do pensamento positivo forçado', sensacao: 'reconhecer o que existe sem ignorar o que falta', keyword: 'como praticar gratidão de verdade' },
+  { tema: 'zona de conforto', angulo: 'por que sair da zona de conforto é mal compreendido e quando faz sentido', sensacao: 'que crescimento tem ritmo próprio', keyword: 'sair da zona de conforto com consciência' },
+  { tema: 'tomada de decisão', angulo: 'como decidir melhor em um mundo cheio de opções', sensacao: 'clareza sobre o que guia suas escolhas', keyword: 'como tomar decisões melhores' },
+  { tema: 'autossabotagem', angulo: 'como identificar comportamentos que nos impedem de avançar', sensacao: 'reconhecer padrões que nos travam', keyword: 'como parar de se autossabotar' },
+  { tema: 'mentalidade de crescimento', angulo: 'o que realmente muda quando você acredita que pode melhorar', sensacao: 'abertura para aprender sem medo de errar', keyword: 'mentalidade de crescimento na prática' },
+  { tema: 'solidão', angulo: 'a diferença entre solidão saudável e isolamento prejudicial', sensacao: 'que estar sozinho pode ser um ato de autocuidado', keyword: 'solidão e autoconhecimento' },
+  { tema: 'comunicação', angulo: 'por que nos comunicamos mal e como melhorar isso no cotidiano', sensacao: 'que falar menos e ouvir mais muda relações', keyword: 'como melhorar a comunicação' },
+  { tema: 'ansiedade', angulo: 'entendendo a ansiedade sem dramatizar nem minimizar', sensacao: 'que a ansiedade tem causas e pode ser manejada', keyword: 'como lidar com a ansiedade no dia a dia' },
+  { tema: 'liderança pessoal', angulo: 'o que significa liderar a própria vida com responsabilidade', sensacao: 'que ser protagonista é uma escolha diária', keyword: 'como desenvolver liderança pessoal' },
+  { tema: 'perfeccionismo', angulo: 'quando a busca pela perfeição vira bloqueio', sensacao: 'que feito é melhor que perfeito na maioria dos casos', keyword: 'como lidar com o perfeccionismo' },
+  { tema: 'relacionamentos', angulo: 'como os vínculos que cultivamos definem quem nos tornamos', sensacao: 'reflexão sobre as pessoas que escolhemos ter perto', keyword: 'relacionamentos e crescimento pessoal' },
+  { tema: 'criatividade', angulo: 'por que todos somos criativos e como desbloqueamos essa capacidade', sensacao: 'que criatividade é prática, não talento inato', keyword: 'como desenvolver criatividade' },
+  { tema: 'saúde mental', angulo: 'o que significa cuidar da saúde mental de forma prática e honesta', sensacao: 'que cuidar da mente é tão importante quanto do corpo', keyword: 'como cuidar da saúde mental' },
+  { tema: 'coragem', angulo: 'a diferença entre coragem real e impulsividade', sensacao: 'que agir com medo ainda é agir', keyword: 'como ser mais corajoso no dia a dia' },
+  { tema: 'identidade', angulo: 'como nossa identidade se forma e por que é tão difícil mudá-la', sensacao: 'que você pode reescrever quem você está sendo', keyword: 'como construir identidade pessoal' },
+  { tema: 'sonhos e metas', angulo: 'a diferença entre sonhar e ter objetivos reais', sensacao: 'que metas concretas transformam sonhos em caminhos', keyword: 'como transformar sonhos em metas reais' },
+  { tema: 'descanso', angulo: 'por que descansar é produtivo e não preguiça', sensacao: 'que parar faz parte do processo de avançar', keyword: 'importância do descanso para produtividade' },
+  { tema: 'autocuidado', angulo: 'o que autocuidado realmente significa além das tendências', sensacao: 'que cuidar de si não é luxo, é necessidade', keyword: 'como praticar autocuidado de verdade' },
+  { tema: 'presença', angulo: 'como a falta de presença nos distancia do que realmente importa', sensacao: 'que viver no momento presente é uma prática', keyword: 'como viver mais presente' },
+  { tema: 'vulnerabilidade', angulo: 'por que mostrar vulnerabilidade exige mais coragem do que escondê-la', sensacao: 'que ser vulnerável é humano e necessário', keyword: 'vulnerabilidade e força pessoal' },
+  { tema: 'paciência', angulo: 'como a cultura da velocidade nos tornou intolerantes à espera', sensacao: 'que os melhores resultados exigem tempo', keyword: 'como desenvolver paciência' },
+  { tema: 'perdão', angulo: 'o que o perdão realmente é e por que ele é para você, não para o outro', sensacao: 'que perdoar é uma forma de se libertar', keyword: 'como perdoar e se libertar do passado' },
+  { tema: 'responsabilidade pessoal', angulo: 'a diferença entre assumir responsabilidade e se culpar', sensacao: 'que ser responsável pelos próprios resultados é poder, não fardo', keyword: 'responsabilidade pessoal e resultados' },
+  { tema: 'adaptabilidade', angulo: 'como as pessoas que lidam melhor com mudanças pensam diferente', sensacao: 'que mudar de plano não é fracasso, é inteligência', keyword: 'como se adaptar a mudanças' },
+  { tema: 'persistência', angulo: 'quando persistir faz sentido e quando é hora de mudar de direção', sensacao: 'que persistência com consciência é diferente de teimosia', keyword: 'como desenvolver persistência' },
+  { tema: 'clareza mental', angulo: 'como o excesso de informação prejudica a capacidade de pensar com clareza', sensacao: 'que simplificar o ambiente mental melhora as decisões', keyword: 'como ter mais clareza mental' },
+];
+
+// ─── Lê posts.ts e conta artigos existentes ──────────────────────────────────
 
 const postsPath = 'src/data/posts.ts';
 const postsRaw = readFileSync(postsPath, 'utf-8');
 
-// Conta quantos slugs já existem para calcular contador_artigo
 const slugMatches = [...postsRaw.matchAll(/slug:\s*"([^"]+)"/g)];
 const totalExistingPosts = slugMatches.length;
 const contadorArtigo = totalExistingPosts + 1;
 const ofereceEbook = contadorArtigo % 3 === 0;
 
 console.log(`📊 Posts existentes: ${totalExistingPosts}`);
-console.log(`📝 Novo artigo será o #${contadorArtigo} | offerEbook: ${ofereceEbook}`);
+console.log(`📝 Novo artigo: #${contadorArtigo} | offerEbook: ${ofereceEbook}`);
 
-// ─── Tema e variáveis ────────────────────────────────────────────────────────
+// Conjunto de slugs existentes para evitar duplicata de tema
+const existingSlugs = new Set(slugMatches.map(m => m[1]));
 
-// Lista de temas de rotatividade para quando não for passado POST_TEMA
-const TEMAS_BANCO = [
-  { tema: 'procrastinação', angulo: 'por que adiamos o que importa e o custo real disso', sensacao: 'clareza sobre o que estamos evitando', keyword: 'procrastinação como parar de adiar' },
-  { tema: 'autoconfiança', angulo: 'como ela se constrói na prática e não pelo pensamento positivo', sensacao: 'entender que confiança vem de ação, não de espera', keyword: 'como desenvolver autoconfiança' },
-  { tema: 'medo do fracasso', angulo: 'por que o fracasso paralisa e como mudar a relação com ele', sensacao: 'menos medo de errar, mais disposição de tentar', keyword: 'medo de fracassar como superar' },
-  { tema: 'hábitos', angulo: 'por que mudar hábitos é difícil e o que realmente funciona', sensacao: 'perspectiva realista sobre mudança de comportamento', keyword: 'como criar hábitos consistentes' },
-  { tema: 'propósito', angulo: 'o mito de encontrar um propósito único e como construir sentido no dia a dia', sensacao: 'que propósito pode ser construído, não apenas descoberto', keyword: 'como encontrar propósito de vida' },
-  { tema: 'comparação com outros', angulo: 'o efeito das redes sociais na autoimagem e como sair do ciclo de comparação', sensacao: 'menos competição interna, mais foco no próprio caminho', keyword: 'parar de se comparar com os outros' },
-  { tema: 'resiliência', angulo: 'o que ela é de verdade além do clichê motivacional', sensacao: 'que resistir não significa ser invulnerável', keyword: 'como desenvolver resiliência' },
-  { tema: 'foco', angulo: 'por que estamos cada vez mais distraídos e o que fazer com isso', sensacao: 'que foco é uma escolha que pode ser treinada', keyword: 'como melhorar o foco e concentração' },
-  { tema: 'disciplina', angulo: 'por que a disciplina sustenta resultados quando a motivação some', sensacao: 'que consistência bate intensidade no longo prazo', keyword: 'disciplina e consistência para resultados' },
-  { tema: 'limites pessoais', angulo: 'por que dizer não é uma forma de respeito próprio', sensacao: 'que impor limites não é egoísmo, é saúde', keyword: 'como impor limites pessoais' },
-];
-
-// Escolhe tema baseado no índice circular para variar sempre
-const temaIdx = totalExistingPosts % TEMAS_BANCO.length;
-const temaDefault = TEMAS_BANCO[temaIdx];
+// Escolhe tema: índice circular, pulando temas cujo slug base já existe
+let temaIdx = totalExistingPosts % TEMAS_BANCO.length;
+let temaDefault = TEMAS_BANCO[temaIdx];
+// Tenta até 10 opções para evitar repetição de tema recente
+for (let i = 0; i < 10; i++) {
+  const candidateSlug = slugify(temaDefault.tema);
+  const jaExiste = [...existingSlugs].some(s => s.includes(candidateSlug.split('-')[0]));
+  if (!jaExiste) break;
+  temaIdx = (temaIdx + 1) % TEMAS_BANCO.length;
+  temaDefault = TEMAS_BANCO[temaIdx];
+}
 
 const tema = process.env.POST_TEMA || temaDefault.tema;
 const angulo = process.env.POST_ANGULO || temaDefault.angulo;
 const sensacao = process.env.POST_SENSACAO || temaDefault.sensacao;
 const palavraChave = process.env.POST_PALAVRA_CHAVE || temaDefault.keyword;
+const modelo = process.env.OPENROUTER_MODEL || 'google/gemini-flash-1.5';
 
 console.log(`🎯 Tema: ${tema}`);
 console.log(`📐 Ângulo: ${angulo}`);
 console.log(`🔑 Palavra-chave: ${palavraChave}`);
+console.log(`🤖 Modelo: ${modelo}`);
 
-// ─── Lê o PROMPT_MESTRE de prompt-mestre.ts ─────────────────────────────────
+// ─── Lê PROMPT_MESTRE ────────────────────────────────────────────────────────
 
 const promptMestreRaw = readFileSync('src/data/prompt-mestre.ts', 'utf-8');
 const promptMestreMatch = promptMestreRaw.match(/export const PROMPT_MESTRE = `([\s\S]*?)`;/);
 if (!promptMestreMatch) throw new Error('Não foi possível extrair PROMPT_MESTRE');
 const PROMPT_MESTRE = promptMestreMatch[1];
 
-// ─── Chama a OpenAI ──────────────────────────────────────────────────────────
-
-console.log('⏳ Gerando artigo via OpenAI...');
+// ─── Monta prompts ────────────────────────────────────────────────────────────
 
 const systemPrompt = PROMPT_MESTRE
   .replace('{tema_desc}', tema)
@@ -126,8 +168,7 @@ const systemPrompt = PROMPT_MESTRE
   .replace('{contador_artigo}', String(contadorArtigo))
   .replace('{oferecer_ebook}', String(ofereceEbook));
 
-const userPrompt = `
-Gere agora um artigo completo seguindo todas as instruções do prompt mestre.
+const userPrompt = `Gere agora um artigo completo seguindo todas as instruções do prompt mestre.
 
 Variáveis para este artigo:
 - tema_desc: ${tema}
@@ -138,54 +179,54 @@ Variáveis para este artigo:
 - oferecer_ebook: ${ofereceEbook}
 
 O artigo deve ter no mínimo 1.220 palavras.
-Responda APENAS com o artigo. Primeira linha: # Título do Artigo. Segunda linha: RESUMO: [resumo até 200 caracteres].
-`;
+Responda APENAS com o artigo. Primeira linha: # Título do Artigo. Segunda linha: RESUMO: [resumo até 200 caracteres].`;
 
-const aiResponse = await jsonPost({
-  model: 'gpt-4o',
+// ─── Chama OpenRouter ─────────────────────────────────────────────────────────
+
+console.log('⏳ Chamando OpenRouter...');
+
+const aiResponse = await callOpenRouter({
+  model: modelo,
   messages: [
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt },
   ],
-  max_tokens: 3500,
-  temperature: 0.8,
+  max_tokens: 4000,
+  temperature: 0.85,
 });
 
 if (aiResponse.error) {
-  console.error('Erro OpenAI:', JSON.stringify(aiResponse.error));
+  console.error('Erro OpenRouter:', JSON.stringify(aiResponse.error, null, 2));
   process.exit(1);
 }
 
 const rawArticle = aiResponse.choices?.[0]?.message?.content;
-if (!rawArticle) {
-  console.error('Resposta vazia da OpenAI');
+if (!rawArticle || rawArticle.trim().length < 500) {
+  console.error('Resposta vazia ou muito curta da IA:', rawArticle);
   process.exit(1);
 }
 
-console.log('✅ Artigo gerado com sucesso!');
+console.log('✅ Artigo gerado! Tamanho:', rawArticle.length, 'chars');
 
 // ─── Extrai título, resumo e parágrafos ──────────────────────────────────────
 
 const lines = rawArticle.split('\n');
 const titleLine = lines.find(l => l.startsWith('# '))?.replace(/^#\s+/, '').trim() || `Artigo sobre ${tema}`;
-const resumoLine = lines.find(l => l.startsWith('RESUMO:'))?.replace(/^RESUMO:\s*/, '').trim() || '';
+const resumoLine = lines.find(l => l.startsWith('RESUMO:'))?.replace(/^RESUMO:\s*/, '').trim() || `Reflexões sobre ${tema} para ajudar você a pensar melhor e agir com mais clareza.`;
 
-// Parágrafos: tudo exceto linha de título e resumo
-const contentLines = lines
-  .filter(l => !l.startsWith('# ') && !l.startsWith('RESUMO:') && l.trim() !== '')
-  .map(l => l.trim());
+const contentLines = lines.filter(l =>
+  !l.startsWith('# ') && !l.startsWith('RESUMO:') && l.trim() !== ''
+).map(l => l.trim());
 
-// Agrupa parágrafos (linhas com ## viram subtítulo, resto é parágrafo normal)
 const paragraphs = [];
 let buffer = '';
 for (const line of contentLines) {
   if (line.startsWith('## ')) {
     if (buffer.trim()) { paragraphs.push(buffer.trim()); buffer = ''; }
-    paragraphs.push(line); // subtítulo no formato "## Texto"
+    paragraphs.push(line);
   } else {
     buffer += (buffer ? ' ' : '') + line;
-    // Quebra parágrafo a cada ~300 chars de forma natural
-    if (buffer.length > 300 && (buffer.endsWith('.') || buffer.endsWith('?') || buffer.endsWith('!'))) {
+    if (buffer.length > 280 && /[.?!]$/.test(buffer)) {
       paragraphs.push(buffer.trim());
       buffer = '';
     }
@@ -193,40 +234,43 @@ for (const line of contentLines) {
 }
 if (buffer.trim()) paragraphs.push(buffer.trim());
 
-// Estimativa de palavras e tempo de leitura
 const wordCount = contentLines.join(' ').split(/\s+/).length;
 const readingTime = `${Math.max(5, Math.round(wordCount / 200))} min`;
 
-// ─── Monta o objeto Post ─────────────────────────────────────────────────────
+// ─── Categoria e tags ─────────────────────────────────────────────────────────
 
-const slug = slugify(titleLine);
-const postDate = today();
-
-// Extrai categoria a partir do tema
 const categoryMap = {
-  procrastinação: 'Produtividade',
-  foco: 'Produtividade',
-  hábitos: 'Hábitos',
-  disciplina: 'Disciplina',
-  autoconfiança: 'Mentalidade',
-  resiliência: 'Mentalidade',
-  propósito: 'Propósito',
-  medo: 'Coragem',
-  comparação: 'Autoconhecimento',
-  limites: 'Autoconhecimento',
+  procrastinação: 'Produtividade', foco: 'Produtividade', gestão: 'Produtividade',
+  hábitos: 'Hábitos', disciplina: 'Disciplina', persistência: 'Disciplina',
+  autoconfiança: 'Mentalidade', resiliência: 'Mentalidade', mentalidade: 'Mentalidade',
+  coragem: 'Coragem', medo: 'Coragem', vulnerabilidade: 'Coragem',
+  propósito: 'Propósito', sonhos: 'Propósito', identidade: 'Propósito',
+  autoconhecimento: 'Autoconhecimento', comparação: 'Autoconhecimento', limites: 'Autoconhecimento',
+  ansiedade: 'Saúde Mental', saúde: 'Saúde Mental', solidão: 'Saúde Mental',
+  relacionamentos: 'Relacionamentos', comunicação: 'Relacionamentos',
+  gratidão: 'Desenvolvimento Pessoal', criatividade: 'Desenvolvimento Pessoal',
 };
 const category = Object.entries(categoryMap).find(([k]) => tema.toLowerCase().includes(k))?.[1] || 'Desenvolvimento Pessoal';
 
-// Tags automáticas
 const tags = [palavraChave, tema, 'desenvolvimento pessoal', 'mentalidade', 'autoconhecimento']
   .filter((v, i, a) => v && a.indexOf(v) === i)
   .slice(0, 5);
 
+const slug = slugify(titleLine);
+const postDate = today();
+
 console.log(`📌 Slug: ${slug}`);
 console.log(`📂 Categoria: ${category}`);
-console.log(`📖 Palavras estimadas: ${wordCount}`);
+console.log(`📖 Palavras: ~${wordCount}`);
 
-// ─── Monta a string do novo post ────────────────────────────────────────────
+// ─── Verifica duplicata de slug ───────────────────────────────────────────────
+
+if (existingSlugs.has(slug)) {
+  console.error(`❌ Slug "${slug}" já existe! Abortando para evitar duplicata.`);
+  process.exit(1);
+}
+
+// ─── Monta bloco do novo post ─────────────────────────────────────────────────
 
 const escapedParagraphs = paragraphs
   .map(p => `      ${JSON.stringify(p)}`)
@@ -235,7 +279,7 @@ const escapedParagraphs = paragraphs
 const newPostBlock = `  {
     slug: "${slug}",
     title: ${JSON.stringify(titleLine)},
-    description: ${JSON.stringify(resumoLine || `Reflexões sobre ${tema} para ajudar você a pensar melhor e agir com mais clareza.`)},
+    description: ${JSON.stringify(resumoLine)},
     date: "${postDate}",
     readingTime: "${readingTime}",
     category: ${JSON.stringify(category)},
@@ -248,22 +292,17 @@ ${escapedParagraphs}
     ],
   }`;
 
-// ─── Insere o novo post no início do array posts ─────────────────────────────
+// ─── Insere no topo do array posts ───────────────────────────────────────────
 
-// Localiza o início do array posts para inserir o novo item no topo
 const insertMarker = 'export const posts: Post[] = [';
 const insertIdx = postsRaw.indexOf(insertMarker);
 if (insertIdx === -1) throw new Error('Não encontrei "export const posts: Post[] = [" em posts.ts');
 
 const insertPoint = insertIdx + insertMarker.length;
 const before = postsRaw.slice(0, insertPoint);
-const after = postsRaw.slice(insertPoint);
+const after = postsRaw.slice(insertPoint).replace(/^\s*/, '\n  ');
 
-// Remove espaço/quebra inicial do array existente para formatar certo
-const afterTrimmed = after.replace(/^\s*/, '\n  ');
+writeFileSync(postsPath, before + '\n' + newPostBlock + ',\n' + after, 'utf-8');
 
-const newPostsContent = before + '\n' + newPostBlock + ',\n' + afterTrimmed;
-
-writeFileSync(postsPath, newPostsContent, 'utf-8');
-console.log('💾 posts.ts atualizado com o novo artigo!');
-console.log(`\n🎉 Post "${titleLine}" publicado com sucesso!`);
+console.log('💾 posts.ts atualizado!');
+console.log(`🎉 Post publicado: "${titleLine}"`);

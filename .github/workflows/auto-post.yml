@@ -1,15 +1,86 @@
-name: Publicar Post Automático
+name: Publicar Posts Automáticos
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ESTRATÉGIA DE CRESCIMENTO EM 3 FASES
+#
+# FASE 1 — Semanas 1 e 2 (21/08 a 03/09/2026): 3 posts/dia
+#   Horários BRT (UTC-3): 07:00, 13:00, 19:00
+#   Cron UTC:             10:00, 16:00, 22:00
+#
+# FASE 2 — Semanas 3 e 4 (04/09 a 17/09/2026): 5 posts/dia
+#   Horários BRT: 06:00, 09:30, 13:00, 16:30, 20:00
+#   Cron UTC:     09:00, 12:30, 16:00, 19:30, 23:00
+#
+# FASE 3 — A partir de 18/09/2026: 8 posts/dia
+#   Horários BRT: 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:30
+#   Cron UTC:     09:00, 11:00, 13:00, 15:00, 17:00, 19:00, 21:00, 23:30
+# ─────────────────────────────────────────────────────────────────────────────
 
 on:
-  # Executa toda segunda e quinta às 08:00 (horário de Brasília = 11:00 UTC)
   schedule:
-    - cron: '0 11 * * 1,4'
 
-  # Permite disparar manualmente pelo GitHub Actions UI
+    # ── FASE 1: 3x/dia | 21/08 – 03/09/2026 ────────────────────────────────
+    # Post 1 — 07h BRT (10h UTC)
+    - cron: '0 10 21,22,23,24,25,26,27,28,29,30,31 8 *'
+    - cron: '0 10 1,2,3 9 *'
+    # Post 2 — 13h BRT (16h UTC)
+    - cron: '0 16 21,22,23,24,25,26,27,28,29,30,31 8 *'
+    - cron: '0 16 1,2,3 9 *'
+    # Post 3 — 19h BRT (22h UTC)
+    - cron: '0 22 21,22,23,24,25,26,27,28,29,30,31 8 *'
+    - cron: '0 22 1,2,3 9 *'
+
+    # ── FASE 2: 5x/dia | 04/09 – 17/09/2026 ────────────────────────────────
+    # Post 1 — 06h BRT (09h UTC)
+    - cron: '0 9 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
+    # Post 2 — 09h30 BRT (12h30 UTC)
+    - cron: '30 12 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
+    # Post 3 — 13h BRT (16h UTC)
+    - cron: '0 16 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
+    # Post 4 — 16h30 BRT (19h30 UTC)
+    - cron: '30 19 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
+    # Post 5 — 20h BRT (23h UTC)
+    - cron: '0 23 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
+
+    # ── FASE 3: 8x/dia | a partir de 18/09/2026 (sem data de fim) ───────────
+    # Post 1 — 06h BRT (09h UTC)
+    - cron: '0 9 18-31 9 *'
+    - cron: '0 9 * 10-12 *'
+    - cron: '0 9 * 1-7 *'
+    # Post 2 — 08h BRT (11h UTC)
+    - cron: '0 11 18-31 9 *'
+    - cron: '0 11 * 10-12 *'
+    - cron: '0 11 * 1-7 *'
+    # Post 3 — 10h BRT (13h UTC)
+    - cron: '0 13 18-31 9 *'
+    - cron: '0 13 * 10-12 *'
+    - cron: '0 13 * 1-7 *'
+    # Post 4 — 12h BRT (15h UTC)
+    - cron: '0 15 18-31 9 *'
+    - cron: '0 15 * 10-12 *'
+    - cron: '0 15 * 1-7 *'
+    # Post 5 — 14h BRT (17h UTC)
+    - cron: '0 17 18-31 9 *'
+    - cron: '0 17 * 10-12 *'
+    - cron: '0 17 * 1-7 *'
+    # Post 6 — 16h BRT (19h UTC)
+    - cron: '0 19 18-31 9 *'
+    - cron: '0 19 * 10-12 *'
+    - cron: '0 19 * 1-7 *'
+    # Post 7 — 18h BRT (21h UTC)
+    - cron: '0 21 18-31 9 *'
+    - cron: '0 21 * 10-12 *'
+    - cron: '0 21 * 1-7 *'
+    # Post 8 — 20h30 BRT (23h30 UTC)
+    - cron: '30 23 18-31 9 *'
+    - cron: '30 23 * 10-12 *'
+    - cron: '30 23 * 1-7 *'
+
+  # Disparo manual com controle total
   workflow_dispatch:
     inputs:
       tema:
-        description: 'Tema do artigo (deixe vazio para usar rotação automática)'
+        description: 'Tema do artigo (vazio = rotação automática)'
         required: false
         default: ''
       angulo:
@@ -17,13 +88,17 @@ on:
         required: false
         default: ''
       sensacao:
-        description: 'Reflexão que o leitor deve levar (opcional)'
+        description: 'Reflexão para o leitor (opcional)'
         required: false
         default: ''
       palavra_chave:
         description: 'Palavra-chave SEO (opcional)'
         required: false
         default: ''
+      modelo:
+        description: 'Modelo OpenRouter (ex: google/gemini-flash-1.5, anthropic/claude-haiku)'
+        required: false
+        default: 'google/gemini-flash-1.5'
 
 jobs:
   generate-and-publish:
@@ -32,20 +107,21 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout do repositório
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           fetch-depth: 0
 
-      - name: Configurar Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Gerar post com OpenAI
+      - name: Gerar post via OpenRouter
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ github.event.inputs.modelo || 'google/gemini-flash-1.5' }}
           POST_TEMA: ${{ github.event.inputs.tema }}
           POST_ANGULO: ${{ github.event.inputs.angulo }}
           POST_SENSACAO: ${{ github.event.inputs.sensacao }}
@@ -57,14 +133,20 @@ jobs:
           git config user.name "Fome de Motivação Bot"
           git config user.email "bot@fomedemotivacao.com.br"
 
-      - name: Commit e push do novo post
+      - name: Commit e push
         run: |
           git add src/data/posts.ts
-          git diff --staged --quiet || git commit -m "feat(posts): adiciona novo artigo automático [skip ci]"
-          git push
+          # Só faz commit se houver mudança real
+          if git diff --staged --quiet; then
+            echo "⚠️ Nenhuma alteração detectada (possível duplicata evitada)."
+          else
+            git commit -m "feat(posts): novo artigo automático [skip ci]"
+            git push
+            echo "🚀 Post publicado e deploy iniciado!"
+          fi
 
-      - name: Resumo do post publicado
+      - name: Resumo
         run: |
-          echo "✅ Post publicado com sucesso!"
-          echo "📅 Data: $(date '+%d/%m/%Y %H:%M')"
-          git log -1 --format='%s'
+          echo "=== RESUMO ==="
+          echo "Data/hora: $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+          echo "Último commit: $(git log -1 --format='%s')"
