@@ -40,8 +40,11 @@ const SiteFooter = () => (
     <div className="max-w-6xl mx-auto px-6 lg:px-12 py-14">
       <div className="grid gap-10 md:grid-cols-3">
         <div>
-          <p className="font-serif text-xl text-foreground mb-3">
-            Manual do <span className="italic text-accent">Insight à Ação</span>
+          <p className="font-serif text-xl text-foreground mb-1">
+            Fome de <span className="italic text-accent">Motivação</span>
+          </p>
+          <p className="text-xs text-foreground/40 mb-3">
+            Produto: Manual do <span className="italic">Insight à Ação</span>
           </p>
           <p className="text-sm text-foreground/60 leading-relaxed max-w-xs">
             Clareza para decidir, método para executar e constância para transformar ideias em resultados reais.
@@ -86,7 +89,7 @@ const SiteFooter = () => (
       <div className="gold-divider my-10" />
 
       <p className="text-xs text-foreground/50 text-center">
-        © {new Date().getFullYear()} Manual do Insight à Ação. Todos os direitos reservados.
+        © {new Date().getFullYear()} Fome de Motivação. Todos os direitos reservados.
       </p>
     </div>
   </footer>

@@ -49,7 +49,7 @@ const SiteHeader = () => {
         className="max-w-7xl mx-auto px-6 lg:px-12 h-16 md:h-20 flex items-center justify-between"
       >
         <Link to="/" className={logoClass}>
-          Manual do{" "}<span className="italic text-accent">Insight à Ação</span>
+          Fome de <span className="italic text-accent">Motivação</span>
         </Link>
 
         <ul className="hidden lg:flex items-center gap-8">
