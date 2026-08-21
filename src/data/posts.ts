@@ -265,3 +265,8 @@ export const posts: Post[] = [
     ],
   },
 ];
+
+export function getPost(slug: string | undefined): Post | undefined {
+  if (!slug) return undefined;
+  return posts.find((p) => p.slug === slug);
+}
