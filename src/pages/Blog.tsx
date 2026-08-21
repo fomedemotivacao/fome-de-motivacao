@@ -15,6 +15,9 @@ const formatDate = (iso: string) =>
 
 const categories = ["Todos", ...Array.from(new Set(posts.map((p) => p.category)))];
 
+/** Retorna o caminho da imagem Unsplash gerada pelo workflow, com fallback para gradiente */
+const postImage = (slug: string) => `/images/posts/${slug}.jpg`;
+
 const Blog = () => {
   const [active, setActive] = useState("Todos");
 
@@ -105,11 +108,25 @@ const Blog = () => {
             {featured && (
               <article className="group rounded-2xl border border-border bg-card shadow-soft overflow-hidden transition-all duration-300 hover:border-accent/50 hover:-translate-y-0.5">
                 <Link to={`/blog/${featured.slug}`} className="md:grid md:grid-cols-5 block">
-                  {/* Bloco visual lateral */}
-                  <div className="md:col-span-2 bg-gradient-to-br from-accent/10 to-accent/5 flex items-center justify-center min-h-[180px] md:min-h-full p-10">
-                    <span className="font-serif text-6xl md:text-7xl text-accent/20 select-none leading-none">
-                      {featured.title.charAt(0)}
-                    </span>
+                  {/* Imagem de capa */}
+                  <div className="md:col-span-2 relative overflow-hidden min-h-[220px] md:min-h-full bg-gradient-to-br from-accent/10 to-accent/5">
+                    <img
+                      src={postImage(featured.slug)}
+                      alt={featured.title}
+                      width={600}
+                      height={400}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        const t = e.currentTarget;
+                        t.style.display = "none";
+                        const parent = t.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<span class="font-serif text-6xl md:text-7xl text-accent/20 select-none leading-none flex items-center justify-center w-full h-full">${featured.title.charAt(0)}</span>`;
+                        }
+                      }}
+                    />
                   </div>
                   {/* Conteúdo */}
                   <div className="md:col-span-3 p-7 md:p-10 flex flex-col justify-between gap-6">
@@ -143,26 +160,41 @@ const Blog = () => {
                 {rest.map((post) => (
                   <article
                     key={post.slug}
-                    className="group flex flex-col rounded-2xl border border-border bg-card p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-accent/50"
+                    className="group flex flex-col rounded-2xl border border-border bg-card shadow-soft overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-accent/50"
                   >
-                    <span className="text-xs uppercase tracking-[0.2em] text-accent font-semibold mb-4">{post.category}</span>
-                    <h2 className="font-serif text-xl leading-snug mb-3">
-                      <Link to={`/blog/${post.slug}`} className="hover:text-accent transition-colors">
-                        {post.title}
-                      </Link>
-                    </h2>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-6 flex-1">{post.description}</p>
-                    <div className="flex items-center gap-4 text-xs text-foreground/50 mb-5">
-                      <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" />{formatDate(post.date)}</span>
-                      <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{post.readingTime}</span>
+                    {/* Thumbnail */}
+                    <div className="relative overflow-hidden h-44 bg-gradient-to-br from-accent/10 to-accent/5 flex-shrink-0">
+                      <img
+                        src={postImage(post.slug)}
+                        alt={post.title}
+                        width={600}
+                        height={300}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                      />
                     </div>
-                    <Link
-                      to={`/blog/${post.slug}`}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-accent group-hover:gap-3 transition-all"
-                      aria-label={`Ler artigo: ${post.title}`}
-                    >
-                      Ler artigo <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </Link>
+                    <div className="p-7 flex flex-col flex-1">
+                      <span className="text-xs uppercase tracking-[0.2em] text-accent font-semibold mb-4">{post.category}</span>
+                      <h2 className="font-serif text-xl leading-snug mb-3">
+                        <Link to={`/blog/${post.slug}`} className="hover:text-accent transition-colors">
+                          {post.title}
+                        </Link>
+                      </h2>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-6 flex-1">{post.description}</p>
+                      <div className="flex items-center gap-4 text-xs text-foreground/50 mb-5">
+                        <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" />{formatDate(post.date)}</span>
+                        <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{post.readingTime}</span>
+                      </div>
+                      <Link
+                        to={`/blog/${post.slug}`}
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-accent group-hover:gap-3 transition-all"
+                        aria-label={`Ler artigo: ${post.title}`}
+                      >
+                        Ler artigo <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </div>
                   </article>
                 ))}
               </div>
