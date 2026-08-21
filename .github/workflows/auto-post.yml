@@ -118,9 +118,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Gerar post via OpenRouter
+      - name: Gerar post via OpenRouter + Unsplash
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
           OPENROUTER_MODEL: ${{ github.event.inputs.modelo || 'google/gemini-flash-1.5' }}
           POST_TEMA: ${{ github.event.inputs.tema }}
           POST_ANGULO: ${{ github.event.inputs.angulo }}
