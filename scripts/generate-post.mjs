@@ -5,6 +5,7 @@
  *
  * Secrets necessários no repositório:
  *   OPENROUTER_API_KEY   — chave do OpenRouter
+ *   UNSPLASH_API_KEY     — chave do Unsplash (para imagens reais)
  *   GH_TOKEN             — GitHub token com permissão contents:write
  *
  * Variáveis de ambiente opcionais (passadas pelo workflow):
@@ -33,9 +34,21 @@ function slugify(text) {
 }
 
 function today() {
-  // Retorna data no fuso de Brasília (UTC-3)
   const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
   return d.toISOString().split('T')[0];
+}
+
+function httpsGet(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      let data = '';
+      res.on('data', (chunk) => (data += chunk));
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); }
+        catch (e) { reject(new Error('Falha ao parsear resposta: ' + data.slice(0, 300))); }
+      });
+    }).on('error', reject);
+  });
 }
 
 function callOpenRouter(body) {
@@ -65,6 +78,68 @@ function callOpenRouter(body) {
     req.write(payload);
     req.end();
   });
+}
+
+// ─── Busca imagem no Unsplash ─────────────────────────────────────────────────
+
+async function buscarImagemUnsplash(query) {
+  const UNSPLASH_KEY = process.env.UNSPLASH_API_KEY;
+  if (!UNSPLASH_KEY) {
+    console.warn('⚠️  UNSPLASH_API_KEY não definida. Usando imagem padrão.');
+    return null;
+  }
+
+  // Traduz termos chave para inglês para melhor resultado no Unsplash
+  const traducoes = {
+    'procrastinação': 'procrastination focus', 'autoconfiança': 'confidence success',
+    'medo': 'fear courage', 'hábitos': 'habits routine morning', 'propósito': 'purpose life goals',
+    'comparação': 'social media comparison', 'resiliência': 'resilience strength',
+    'foco': 'focus concentration work', 'disciplina': 'discipline training',
+    'limites': 'boundaries personal space', 'autoconhecimento': 'self reflection mirror',
+    'gestão do tempo': 'time management productivity', 'motivação': 'motivation energy',
+    'fracasso': 'failure learning', 'gratidão': 'gratitude thankful', 'zona de conforto': 'comfort zone growth',
+    'tomada de decisão': 'decision making choice', 'autossabotagem': 'self sabotage mindset',
+    'mentalidade': 'mindset growth success', 'solidão': 'solitude alone peaceful',
+    'comunicação': 'communication people talking', 'ansiedade': 'anxiety calm mindfulness',
+    'liderança': 'leadership team success', 'perfeccionismo': 'perfectionism detail work',
+    'relacionamentos': 'relationships people connection', 'criatividade': 'creativity art inspiration',
+    'saúde mental': 'mental health wellbeing', 'coragem': 'courage brave challenge',
+    'identidade': 'identity self portrait', 'sonhos': 'dreams goals vision',
+    'descanso': 'rest relaxation peace', 'autocuidado': 'self care wellness',
+    'presença': 'mindfulness present moment', 'vulnerabilidade': 'vulnerability human emotion',
+    'paciência': 'patience calm waiting', 'perdão': 'forgiveness peace heart',
+    'responsabilidade': 'responsibility accountability', 'adaptabilidade': 'adaptability change',
+    'persistência': 'persistence determination', 'clareza mental': 'mental clarity thinking',
+  };
+
+  const queryEn = Object.entries(traducoes).find(([k]) =>
+    query.toLowerCase().includes(k)
+  )?.[1] || `${query} motivation personal development`;
+
+  try {
+    const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(queryEn)}&per_page=10&orientation=landscape&client_id=${UNSPLASH_KEY}`;
+    const data = await httpsGet(url);
+
+    if (!data.results || data.results.length === 0) {
+      console.warn('⚠️  Nenhuma imagem encontrada no Unsplash para:', queryEn);
+      return null;
+    }
+
+    // Pega imagem aleatória entre os top 5 resultados
+    const pick = data.results[Math.floor(Math.random() * Math.min(5, data.results.length))];
+    const imageUrl = pick.urls.regular; // ~1080px de largura, ideal para blog
+    const authorName = pick.user.name;
+    const authorLink = pick.user.links.html + '?utm_source=fome_de_motivacao&utm_medium=referral';
+    const unsplashLink = pick.links.html + '?utm_source=fome_de_motivacao&utm_medium=referral';
+
+    console.log(`🖼️  Imagem Unsplash: ${imageUrl}`);
+    console.log(`📸 Foto por: ${authorName} | ${unsplashLink}`);
+
+    return { url: imageUrl, author: authorName, authorLink, unsplashLink };
+  } catch (err) {
+    console.warn('⚠️  Erro ao buscar imagem no Unsplash:', err.message);
+    return null;
+  }
 }
 
 // ─── Banco de temas (40 temas variados para cobrir semanas sem repetição) ─────
@@ -125,13 +200,11 @@ const ofereceEbook = contadorArtigo % 3 === 0;
 console.log(`📊 Posts existentes: ${totalExistingPosts}`);
 console.log(`📝 Novo artigo: #${contadorArtigo} | offerEbook: ${ofereceEbook}`);
 
-// Conjunto de slugs existentes para evitar duplicata de tema
 const existingSlugs = new Set(slugMatches.map(m => m[1]));
 
 // Escolhe tema: índice circular, pulando temas cujo slug base já existe
 let temaIdx = totalExistingPosts % TEMAS_BANCO.length;
 let temaDefault = TEMAS_BANCO[temaIdx];
-// Tenta até 10 opções para evitar repetição de tema recente
 for (let i = 0; i < 10; i++) {
   const candidateSlug = slugify(temaDefault.tema);
   const jaExiste = [...existingSlugs].some(s => s.includes(candidateSlug.split('-')[0]));
@@ -157,6 +230,11 @@ const promptMestreRaw = readFileSync('src/data/prompt-mestre.ts', 'utf-8');
 const promptMestreMatch = promptMestreRaw.match(/export const PROMPT_MESTRE = `([\s\S]*?)`;/);
 if (!promptMestreMatch) throw new Error('Não foi possível extrair PROMPT_MESTRE');
 const PROMPT_MESTRE = promptMestreMatch[1];
+
+// ─── Busca imagem no Unsplash (em paralelo com chamada da IA) ─────────────────
+
+console.log('🖼️  Buscando imagem no Unsplash...');
+const unsplashPromise = buscarImagemUnsplash(tema);
 
 // ─── Monta prompts ────────────────────────────────────────────────────────────
 
@@ -185,15 +263,18 @@ Responda APENAS com o artigo. Primeira linha: # Título do Artigo. Segunda linha
 
 console.log('⏳ Chamando OpenRouter...');
 
-const aiResponse = await callOpenRouter({
-  model: modelo,
-  messages: [
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: userPrompt },
-  ],
-  max_tokens: 4000,
-  temperature: 0.85,
-});
+const [aiResponse, unsplashResult] = await Promise.all([
+  callOpenRouter({
+    model: modelo,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    max_tokens: 4000,
+    temperature: 0.85,
+  }),
+  unsplashPromise,
+]);
 
 if (aiResponse.error) {
   console.error('Erro OpenRouter:', JSON.stringify(aiResponse.error, null, 2));
@@ -237,6 +318,26 @@ if (buffer.trim()) paragraphs.push(buffer.trim());
 const wordCount = contentLines.join(' ').split(/\s+/).length;
 const readingTime = `${Math.max(5, Math.round(wordCount / 200))} min`;
 
+// ─── Imagem final: Unsplash ou fallback /og/{slug} ───────────────────────────
+
+const slug = slugify(titleLine);
+const postDate = today();
+
+let imageUrl;
+let imageCredit = null;
+
+if (unsplashResult) {
+  imageUrl = unsplashResult.url;
+  imageCredit = {
+    author: unsplashResult.author,
+    authorLink: unsplashResult.authorLink,
+    unsplashLink: unsplashResult.unsplashLink,
+  };
+} else {
+  imageUrl = `/og/${slug}`;
+  console.log('📷 Usando imagem OG gerada dinamicamente:', imageUrl);
+}
+
 // ─── Categoria e tags ─────────────────────────────────────────────────────────
 
 const categoryMap = {
@@ -256,12 +357,10 @@ const tags = [palavraChave, tema, 'desenvolvimento pessoal', 'mentalidade', 'aut
   .filter((v, i, a) => v && a.indexOf(v) === i)
   .slice(0, 5);
 
-const slug = slugify(titleLine);
-const postDate = today();
-
 console.log(`📌 Slug: ${slug}`);
 console.log(`📂 Categoria: ${category}`);
 console.log(`📖 Palavras: ~${wordCount}`);
+console.log(`🖼️  Imagem final: ${imageUrl}`);
 
 // ─── Verifica duplicata de slug ───────────────────────────────────────────────
 
@@ -276,6 +375,11 @@ const escapedParagraphs = paragraphs
   .map(p => `      ${JSON.stringify(p)}`)
   .join(',\n');
 
+// Monta campo imageCredit condicionalmente
+const imageCreditField = imageCredit
+  ? `,\n    imageCredit: { author: ${JSON.stringify(imageCredit.author)}, authorLink: ${JSON.stringify(imageCredit.authorLink)}, unsplashLink: ${JSON.stringify(imageCredit.unsplashLink)} }`
+  : '';
+
 const newPostBlock = `  {
     slug: "${slug}",
     title: ${JSON.stringify(titleLine)},
@@ -286,7 +390,7 @@ const newPostBlock = `  {
     tags: ${JSON.stringify(tags)},
     wordCount: ${wordCount},
     offerEbook: ${ofereceEbook},
-    image: "/og/${slug}",
+    image: ${JSON.stringify(imageUrl)}${imageCreditField},
     content: [
 ${escapedParagraphs}
     ],
@@ -306,3 +410,6 @@ writeFileSync(postsPath, before + '\n' + newPostBlock + ',\n' + after, 'utf-8');
 
 console.log('💾 posts.ts atualizado!');
 console.log(`🎉 Post publicado: "${titleLine}"`);
+if (imageCredit) {
+  console.log(`📸 Crédito da imagem: ${imageCredit.author} via Unsplash`);
+}
