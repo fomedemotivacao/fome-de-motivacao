@@ -5,6 +5,8 @@ import SiteFooter from "@/components/SiteFooter";
 import Seo from "@/components/Seo";
 import { posts } from "@/data/posts";
 
+const SITE_URL = "https://manualdoinsightaacao.com.br";
+
 const formatDate = (iso: string) =>
   new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
 
@@ -14,18 +16,29 @@ const Blog = () => (
       title="Blog sobre motivação, clareza e execução | Manual do Insight à Ação"
       description="Artigos práticos sobre motivação, disciplina, clareza mental e produtividade para sair da paralisia e transformar ideias em ação constante."
       path="/blog"
+      keywords="motivação, produtividade, clareza mental, disciplina, execução, hábitos, foco"
       jsonLd={{
         "@context": "https://schema.org",
         "@type": "Blog",
+        "@id": `${SITE_URL}/blog`,
         name: "Blog Manual do Insight à Ação",
         description: "Artigos sobre motivação, clareza mental, disciplina e execução.",
+        url: `${SITE_URL}/blog`,
         inLanguage: "pt-BR",
+        publisher: {
+          "@type": "Organization",
+          name: "Manual do Insight à Ação",
+          url: SITE_URL,
+        },
         blogPost: posts.map((p) => ({
           "@type": "BlogPosting",
+          "@id": `${SITE_URL}/blog/${p.slug}`,
           headline: p.title,
           description: p.description,
           datePublished: p.date,
-          url: `/blog/${p.slug}`,
+          url: `${SITE_URL}/blog/${p.slug}`,
+          inLanguage: "pt-BR",
+          author: { "@type": "Organization", name: "Manual do Insight à Ação" },
         })),
       }}
     />
@@ -70,8 +83,9 @@ const Blog = () => (
               <Link
                 to={`/blog/${post.slug}`}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-accent group-hover:gap-3 transition-all"
+                aria-label={`Ler artigo: ${post.title}`}
               >
-                Ler artigo <ArrowRight className="h-4 w-4" />
+                Ler artigo <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </article>
           ))}

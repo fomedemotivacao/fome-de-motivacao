@@ -6,6 +6,7 @@ import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { getPost, posts } from "@/data/posts";
 
+const SITE_URL = "https://manualdoinsightaacao.com.br";
 const CHECKOUT_URL = "https://pay.kiwify.com.br/9h8nNa3";
 
 const formatDate = (iso: string) =>
@@ -27,17 +28,40 @@ const BlogPost = () => {
         path={`/blog/${post.slug}`}
         type="article"
         publishedTime={post.date}
+        keywords={`${post.category.toLowerCase()}, motivação, produtividade, clareza mental, execução`}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "BlogPosting",
+          "@id": `${SITE_URL}/blog/${post.slug}`,
           headline: post.title,
           description: post.description,
           datePublished: post.date,
+          dateModified: post.date,
           inLanguage: "pt-BR",
+          url: `${SITE_URL}/blog/${post.slug}`,
           articleSection: post.category,
-          mainEntityOfPage: `/blog/${post.slug}`,
-          author: { "@type": "Organization", name: "Manual do Insight à Ação" },
-          publisher: { "@type": "Organization", name: "Manual do Insight à Ação" },
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": `${SITE_URL}/blog/${post.slug}`,
+          },
+          author: {
+            "@type": "Organization",
+            name: "Manual do Insight à Ação",
+            url: SITE_URL,
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "Manual do Insight à Ação",
+            url: SITE_URL,
+            logo: {
+              "@type": "ImageObject",
+              url: `${SITE_URL}/og-image.jpg`,
+            },
+          },
+          isPartOf: {
+            "@type": "Blog",
+            "@id": `${SITE_URL}/blog`,
+          },
         }}
       />
       <SiteHeader />
@@ -46,13 +70,17 @@ const BlogPost = () => {
         <article className="pt-32 pb-16 md:pt-40">
           <header className="max-w-3xl mx-auto px-6 lg:px-12 mb-12">
             <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-accent hover:gap-3 transition-all mb-8">
-              <ArrowLeft className="h-4 w-4" /> Voltar para o blog
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Voltar para o blog
             </Link>
             <span className="block text-xs uppercase tracking-[0.25em] text-accent font-semibold mb-4">{post.category}</span>
             <h1 className="font-serif text-4xl md:text-5xl leading-[1.1] text-balance mb-6">{post.title}</h1>
             <div className="flex flex-wrap items-center gap-5 text-xs text-foreground/50">
-              <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" />{formatDate(post.date)}</span>
-              <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{post.readingTime} de leitura</span>
+              <time dateTime={post.date} className="inline-flex items-center gap-1.5">
+                <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />{formatDate(post.date)}
+              </time>
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" aria-hidden="true" />{post.readingTime} de leitura
+              </span>
             </div>
             <div className="gold-divider mt-10" />
           </header>
@@ -67,7 +95,7 @@ const BlogPost = () => {
             )}
           </div>
 
-          <aside className="max-w-3xl mx-auto px-6 lg:px-12 mt-16">
+          <aside className="max-w-3xl mx-auto px-6 lg:px-12 mt-16" aria-label="Oferta do manual">
             <div className="rounded-2xl border border-accent/30 bg-card p-8 text-center shadow-elegant">
               <h2 className="font-serif text-2xl md:text-3xl mb-3">Quer aplicar isso com um método completo?</h2>
               <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -82,7 +110,7 @@ const BlogPost = () => {
           </aside>
         </article>
 
-        <section className="py-16 border-t border-border">
+        <nav aria-label="Artigos relacionados" className="py-16 border-t border-border">
           <div className="max-w-6xl mx-auto px-6 lg:px-12">
             <h2 className="font-serif text-3xl mb-8">Continue lendo</h2>
             <div className="grid gap-6 md:grid-cols-3">
@@ -98,7 +126,7 @@ const BlogPost = () => {
               ))}
             </div>
           </div>
-        </section>
+        </nav>
       </main>
 
       <SiteFooter />
