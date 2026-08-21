@@ -1,7 +1,8 @@
 /**
  * generate-post.mjs
- * Gera um novo post para o Fome de Motivação usando a API do OpenRouter
- * e atualiza src/data/posts.ts com o novo artigo.
+ * Gera um novo post para o Fome de Motivação usando a API do OpenRouter,
+ * atualiza src/data/posts.ts com o novo artigo (com imagem Unsplash integrada),
+ * e atualiza public/sitemap.xml adicionando a URL do novo post.
  *
  * Secrets necessários no repositório:
  *   OPENROUTER_API_KEY   — chave do OpenRouter
@@ -16,7 +17,7 @@
  *   OPENROUTER_MODEL     — modelo a usar (padrão: google/gemini-flash-1.5)
  */
 
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import https from 'https';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -85,11 +86,10 @@ function callOpenRouter(body) {
 async function buscarImagemUnsplash(query) {
   const UNSPLASH_KEY = process.env.UNSPLASH_API_KEY;
   if (!UNSPLASH_KEY) {
-    console.warn('⚠️  UNSPLASH_API_KEY não definida. Usando imagem padrão.');
+    console.warn('⚠️  UNSPLASH_API_KEY não definida. Usando imagem OG dinâmica.');
     return null;
   }
 
-  // Traduz termos chave para inglês para melhor resultado no Unsplash
   const traducoes = {
     'procrastinação': 'procrastination focus', 'autoconfiança': 'confidence success',
     'medo': 'fear courage', 'hábitos': 'habits routine morning', 'propósito': 'purpose life goals',
@@ -125,9 +125,8 @@ async function buscarImagemUnsplash(query) {
       return null;
     }
 
-    // Pega imagem aleatória entre os top 5 resultados
     const pick = data.results[Math.floor(Math.random() * Math.min(5, data.results.length))];
-    const imageUrl = pick.urls.regular; // ~1080px de largura, ideal para blog
+    const imageUrl = pick.urls.regular;
     const authorName = pick.user.name;
     const authorLink = pick.user.links.html + '?utm_source=fome_de_motivacao&utm_medium=referral';
     const unsplashLink = pick.links.html + '?utm_source=fome_de_motivacao&utm_medium=referral';
@@ -142,7 +141,56 @@ async function buscarImagemUnsplash(query) {
   }
 }
 
-// ─── Banco de temas (40 temas variados para cobrir semanas sem repetição) ─────
+// ─── Atualiza sitemap.xml ─────────────────────────────────────────────────────
+
+function atualizarSitemap(slug, date) {
+  const BASE_URL = 'https://fomedemotivacao.com.br';
+  const sitemapPath = 'public/sitemap.xml';
+
+  const postUrl = `${BASE_URL}/post/${slug}`;
+  const lastmod = date; // YYYY-MM-DD
+
+  let sitemapContent = '';
+
+  if (existsSync(sitemapPath)) {
+    sitemapContent = readFileSync(sitemapPath, 'utf-8');
+  } else {
+    // Cria sitemap mínimo se não existir
+    sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+</urlset>`;
+    console.log('📄 sitemap.xml não encontrado — criando novo.');
+  }
+
+  // Verifica se o slug já existe no sitemap (evita duplicata)
+  if (sitemapContent.includes(`/post/${slug}`)) {
+    console.log(`ℹ️  URL já existe no sitemap: /post/${slug}`);
+    return false;
+  }
+
+  // Bloco da nova URL
+  const newUrlBlock = `  <url>
+    <loc>${postUrl}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+
+  // Insere antes do fechamento </urlset>
+  const updated = sitemapContent.replace(
+    '</urlset>',
+    `${newUrlBlock}\n</urlset>`
+  );
+
+  writeFileSync(sitemapPath, updated, 'utf-8');
+  console.log(`🗺️  sitemap.xml atualizado: ${postUrl}`);
+  return true;
+}
+
+// ─── Banco de temas ───────────────────────────────────────────────────────────
 
 const TEMAS_BANCO = [
   { tema: 'procrastinação', angulo: 'por que adiamos o que importa e o custo real disso', sensacao: 'clareza sobre o que estamos evitando', keyword: 'procrastinação como parar de adiar' },
@@ -202,7 +250,6 @@ console.log(`📝 Novo artigo: #${contadorArtigo} | offerEbook: ${ofereceEbook}`
 
 const existingSlugs = new Set(slugMatches.map(m => m[1]));
 
-// Escolhe tema: índice circular, pulando temas cujo slug base já existe
 let temaIdx = totalExistingPosts % TEMAS_BANCO.length;
 let temaDefault = TEMAS_BANCO[temaIdx];
 for (let i = 0; i < 10; i++) {
@@ -256,7 +303,7 @@ Variáveis para este artigo:
 - contador_artigo: ${contadorArtigo}
 - oferecer_ebook: ${ofereceEbook}
 
-O artigo deve ter no mínimo 1.220 palavras.
+ATENÇÃO: O artigo deve ter NO MÍNIMO 1.200 PALAVRAS. Preferencialmente entre 1.300 e 1.700 palavras.
 Responda APENAS com o artigo. Primeira linha: # Título do Artigo. Segunda linha: RESUMO: [resumo até 200 caracteres].`;
 
 // ─── Chama OpenRouter ─────────────────────────────────────────────────────────
@@ -270,7 +317,7 @@ const [aiResponse, unsplashResult] = await Promise.all([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ],
-    max_tokens: 4000,
+    max_tokens: 4500,
     temperature: 0.85,
   }),
   unsplashPromise,
@@ -317,6 +364,14 @@ if (buffer.trim()) paragraphs.push(buffer.trim());
 
 const wordCount = contentLines.join(' ').split(/\s+/).length;
 const readingTime = `${Math.max(5, Math.round(wordCount / 200))} min`;
+
+// ─── Verifica contagem mínima de palavras ─────────────────────────────────────
+
+if (wordCount < 1200) {
+  console.warn(`⚠️  Artigo com ${wordCount} palavras — abaixo do mínimo de 1.200. Continuando mesmo assim.`);
+} else {
+  console.log(`✅ Contagem de palavras OK: ${wordCount} palavras.`);
+}
 
 // ─── Imagem final: Unsplash ou fallback /og/{slug} ───────────────────────────
 
@@ -375,7 +430,6 @@ const escapedParagraphs = paragraphs
   .map(p => `      ${JSON.stringify(p)}`)
   .join(',\n');
 
-// Monta campo imageCredit condicionalmente
 const imageCreditField = imageCredit
   ? `,\n    imageCredit: { author: ${JSON.stringify(imageCredit.author)}, authorLink: ${JSON.stringify(imageCredit.authorLink)}, unsplashLink: ${JSON.stringify(imageCredit.unsplashLink)} }`
   : '';
@@ -409,7 +463,17 @@ const after = postsRaw.slice(insertPoint).replace(/^\s*/, '\n  ');
 writeFileSync(postsPath, before + '\n' + newPostBlock + ',\n' + after, 'utf-8');
 
 console.log('💾 posts.ts atualizado!');
+
+// ─── Atualiza sitemap.xml ─────────────────────────────────────────────────────
+
+atualizarSitemap(slug, postDate);
+
+// ─── Resumo final ─────────────────────────────────────────────────────────────
+
 console.log(`🎉 Post publicado: "${titleLine}"`);
+console.log(`📅 Data: ${postDate}`);
+console.log(`📖 Palavras: ${wordCount} | Leitura: ${readingTime}`);
 if (imageCredit) {
   console.log(`📸 Crédito da imagem: ${imageCredit.author} via Unsplash`);
 }
+console.log(`🗺️  Sitemap: https://fomedemotivacao.com.br/post/${slug}`);
