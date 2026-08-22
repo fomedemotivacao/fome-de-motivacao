@@ -27,12 +27,15 @@ const SectionLabel = ({ children }: { children: React.ReactNode }) => (
 
 const Index = () => {
   return (
-    <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <SiteHeader />
+      <main>
       {/* ============ HERO ============ */}
       <section className="relative bg-gradient-hero text-foreground overflow-hidden">
         <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 70%, white 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-terracotta/20 blur-[120px] rounded-full pointer-events-none" />
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-12 pt-20 pb-24 md:pt-28 md:pb-32">
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-12 pt-32 pb-24 md:pt-40 md:pb-32">
+
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="animate-fade-up">
               <SectionLabel>Edição Premium • Manual do Insight à Ação</SectionLabel>
