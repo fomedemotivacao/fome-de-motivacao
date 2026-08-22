@@ -1,6 +1,9 @@
 import { Helmet } from "react-helmet-async";
 
-const SITE_URL = "https://manualdoinsightaacao.com.br";
+const SITE_URL = "https://fomedemotivacao.com.br";
+const SITE_NAME = "Fome de Motivação";
+const TWITTER_HANDLE = "@fomedemotivacao";
+const DEFAULT_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 interface SeoProps {
   title: string;
@@ -10,17 +13,13 @@ interface SeoProps {
   publishedTime?: string;
   modifiedTime?: string;
   image?: string;
-  jsonLd?: Record<string, unknown>;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   noindex?: boolean;
   keywords?: string;
   tags?: string[];
   section?: string;
   author?: string;
 }
-
-const DEFAULT_IMAGE = `${SITE_URL}/og-image.jpg`;
-const SITE_NAME = "Manual do Insight à Ação";
-const TWITTER_HANDLE = "@manualdoinsight";
 
 const Seo = ({
   title,
@@ -43,9 +42,13 @@ const Seo = ({
     ? "noindex, nofollow"
     : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1";
 
+  // Suporte a múltiplos JSON-LD (array) ou único objeto
+  const jsonLdScripts = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
+
   return (
     <Helmet>
       {/* ── Básico ── */}
+      <html lang="pt-BR" />
       <title>{title}</title>
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
@@ -53,6 +56,11 @@ const Seo = ({
       <meta name="robots" content={robotsContent} />
       <meta name="author" content={author} />
       <meta name="theme-color" content="#0f0e0c" />
+
+      {/* ── Preconnect para performance ── */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://images.unsplash.com" />
 
       {/* ── Open Graph ── */}
       <meta property="og:site_name" content={SITE_NAME} />
@@ -95,10 +103,12 @@ const Seo = ({
       <meta name="twitter:image" content={ogImage} />
       <meta name="twitter:image:alt" content={title} />
 
-      {/* ── JSON-LD ── */}
-      {jsonLd && (
-        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
-      )}
+      {/* ── JSON-LD (suporta array de schemas) ── */}
+      {jsonLdScripts.map((schema, i) => (
+        <script key={i} type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      ))}
     </Helmet>
   );
 };

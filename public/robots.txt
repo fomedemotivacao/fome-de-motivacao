@@ -1,8 +1,17 @@
+# Fome de Motivação — robots.txt
+# https://fomedemotivacao.com.br
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -10,5 +19,7 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
+User-agent: LinkedInBot
 Allow: /
+
+Sitemap: https://fomedemotivacao.com.br/sitemap.xml
