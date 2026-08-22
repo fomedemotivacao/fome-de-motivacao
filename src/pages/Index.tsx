@@ -147,7 +147,7 @@ const Index = () => {
       </section>
 
       {/* ============ BENEFÍCIOS ============ */}
-      <section className="py-24 md:py-32 bg-background">
+      <section id="beneficios" className="py-24 md:py-32 bg-background">
         <div className="max-w-6xl mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
             <SectionLabel>O que muda em você</SectionLabel>
@@ -212,7 +212,7 @@ const Index = () => {
       </section>
 
       {/* ============ PROVA SOCIAL ============ */}
-      <section className="py-24 md:py-32 bg-background">
+      <section id="depoimentos" className="py-24 md:py-32 bg-background">
         <div className="max-w-6xl mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
             <SectionLabel>Quem aplicou, conta</SectionLabel>
@@ -355,7 +355,7 @@ const Index = () => {
       </section>
 
       {/* ============ FAQ ============ */}
-      <section className="py-24 md:py-32 bg-gradient-cream">
+      <section id="faq" className="py-24 md:py-32 bg-gradient-cream">
         <div className="max-w-3xl mx-auto px-6 lg:px-12">
           <div className="text-center mb-12">
             <SectionLabel>Perguntas frequentes</SectionLabel>
