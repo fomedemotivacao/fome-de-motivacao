@@ -4,6 +4,7 @@ const SITE_URL = "https://fomedemotivacao.com.br";
 const SITE_NAME = "Fome de Motivação";
 const TWITTER_HANDLE = "@fomedemotivacao";
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.jpg`;
+const LOGO_URL = `${SITE_URL}/logo-publisher.png`;
 
 interface SeoProps {
   title: string;
@@ -45,6 +46,27 @@ const Seo = ({
   // Suporte a múltiplos JSON-LD (array) ou único objeto
   const jsonLdScripts = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
 
+  // Schema Organization padrão injetado em todas as páginas
+  const orgSchema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: {
+      "@type": "ImageObject",
+      "@id": `${SITE_URL}/#logo`,
+      url: LOGO_URL,
+      width: 200,
+      height: 60,
+      caption: SITE_NAME,
+    },
+    sameAs: [
+      "https://twitter.com/fomedemotivacao",
+      "https://www.instagram.com/fomedemotivacao",
+    ],
+  };
+
   return (
     <Helmet>
       {/* ── Básico ── */}
@@ -61,6 +83,9 @@ const Seo = ({
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link rel="preconnect" href="https://images.unsplash.com" />
+
+      {/* ── Sitemap reference ── */}
+      <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
       {/* ── Open Graph ── */}
       <meta property="og:site_name" content={SITE_NAME} />
@@ -102,6 +127,11 @@ const Seo = ({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
       <meta name="twitter:image:alt" content={title} />
+
+      {/* ── Organization Schema (global) ── */}
+      <script type="application/ld+json">
+        {JSON.stringify(orgSchema)}
+      </script>
 
       {/* ── JSON-LD (suporta array de schemas) ── */}
       {jsonLdScripts.map((schema, i) => (
