@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
   xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
 >
 
@@ -28,7 +27,7 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://images.unsplash.com/photo-1740313498441-68da0e01df37?w=1200&q=80</image:loc>
+      <image:loc>https://images.unsplash.com/photo-1740313498441-68da0e01df37?w=1200&amp;q=80</image:loc>
       <image:title>Como Desenvolver Autoconfiança na Prática</image:title>
     </image:image>
   </url>
@@ -39,7 +38,7 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://images.unsplash.com/photo-1431499012454-31a9601150c9?w=1200&q=80</image:loc>
+      <image:loc>https://images.unsplash.com/photo-1431499012454-31a9601150c9?w=1200&amp;q=80</image:loc>
       <image:title>Por que sua energia, e não seu relógio, decide o que você realmente realiza</image:title>
     </image:image>
   </url>
@@ -54,55 +53,6 @@
   <url>
     <loc>https://fomedemotivacao.com.br/blog/motivacao-sistemas-disciplina</loc>
     <lastmod>2026-08-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fomedemotivacao.com.br/blog/clareza-mental-rotina-e-decisoes</loc>
-    <lastmod>2026-07-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fomedemotivacao.com.br/blog/por-que-boas-ideias-morrem</loc>
-    <lastmod>2026-07-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fomedemotivacao.com.br/blog/disciplina-nos-dias-ruins</loc>
-    <lastmod>2026-07-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fomedemotivacao.com.br/blog/metas-comportamento-e-revisao</loc>
-    <lastmod>2026-07-02</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fomedemotivacao.com.br/blog/relacionamentos-que-drenam-energia</loc>
-    <lastmod>2026-08-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fomedemotivacao.com.br/blog/habitos-que-sustentam-resultados</loc>
-    <lastmod>2026-08-21</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://fomedemotivacao.com.br/blog/limites-e-dizer-nao</loc>
-    <lastmod>2026-08-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
