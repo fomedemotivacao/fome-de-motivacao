@@ -400,15 +400,12 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ============ FOOTER ============ */}
-      <footer className="bg-bordeaux-deep text-foreground/60 py-10 border-t border-border">
-        <div className="max-w-6xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-          <p className="font-serif text-lg text-foreground">Manual do Insight à Ação</p>
-          <p>© {new Date().getFullYear()}. Todos os direitos reservados.</p>
-        </div>
-      </footer>
-    </main>
+      </main>
+
+      <SiteFooter />
+    </div>
   );
 };
 
 export default Index;
+
