@@ -70,5 +70,41 @@
     "description": "Cheerful guy in glasses is using laptop typing working at table in office concentrated on job. Modern technology, young people and occupation concept.",
     "query": "goals achievement productivity focus work desk",
     "fetchedAt": "2026-08-21T12:50:51.557Z"
+  },
+  "relacionamentos-que-drenam-energia": {
+    "slug": "relacionamentos-que-drenam-energia",
+    "localPath": "/images/posts/relacionamentos-que-drenam-energia.jpg",
+    "generatedQuery": "mindset growth person",
+    "unsplashId": "d9jRe-zR-7Y",
+    "unsplashUrl": "https://unsplash.com/photos/a-person-standing-on-a-rocky-hill-d9jRe-zR-7Y",
+    "photographer": "Benoît Deschasaux",
+    "photographerUsername": "benowa",
+    "photographerProfile": "https://unsplash.com/@benowa",
+    "description": "Lonely man looking at the breathtaking landscape at sunset ",
+    "fetchedAt": "2026-08-22T03:24:59.720Z"
+  },
+  "habitos-que-sustentam-resultados": {
+    "slug": "habitos-que-sustentam-resultados",
+    "localPath": "/images/posts/habitos-que-sustentam-resultados.jpg",
+    "generatedQuery": "mindset growth person",
+    "unsplashId": "71Ql9l7dyrQ",
+    "unsplashUrl": "https://unsplash.com/photos/man-standing-on-top-of-mountain-during-daytime-71Ql9l7dyrQ",
+    "photographer": "Jasper Van Lommel",
+    "photographerUsername": "graaf",
+    "photographerProfile": "https://unsplash.com/@graaf",
+    "description": "I visited Yosemite in the summer of 2016. After a long hike, we drove to watch te sunset on Glacier Point. There were so many people around us, but I saw this one man standing alone on a steep cliff, with the light of the evening sun on his face. The image shows the natural beauty of Yosemite Valley and the huge size of the canyon.",
+    "fetchedAt": "2026-08-22T03:25:03.151Z"
+  },
+  "limites-e-dizer-nao": {
+    "slug": "limites-e-dizer-nao",
+    "localPath": "/images/posts/limites-e-dizer-nao.jpg",
+    "generatedQuery": "mindset growth person",
+    "unsplashId": "x5nZzttn2_k",
+    "unsplashUrl": "https://unsplash.com/photos/person-raising-hands-x5nZzttn2_k",
+    "photographer": "Eunice De Guzman",
+    "photographerUsername": "edg0308",
+    "photographerProfile": "https://unsplash.com/@edg0308",
+    "description": "Success",
+    "fetchedAt": "2026-08-22T03:25:06.232Z"
   }
 }
