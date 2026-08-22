@@ -79,9 +79,9 @@ on:
         required: false
         default: ''
       modelo:
-        description: 'Modelo OpenRouter (ex: google/gemini-2.0-flash-001, anthropic/claude-haiku-4-5)'
+        description: 'Modelo OpenRouter (ex: google/gemma-4-31b-it:free, meta-llama/llama-3.3-70b-instruct:free)'
         required: false
-        default: 'google/gemini-2.0-flash-001'
+        default: 'google/gemma-4-31b-it:free'
 
 jobs:
   generate-and-publish:
@@ -105,7 +105,7 @@ jobs:
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
-          OPENROUTER_MODEL: ${{ github.event.inputs.modelo || 'google/gemini-2.0-flash-001' }}
+          OPENROUTER_MODEL: ${{ github.event.inputs.modelo || 'google/gemma-4-31b-it:free' }}
           POST_TEMA: ${{ github.event.inputs.tema }}
           POST_ANGULO: ${{ github.event.inputs.angulo }}
           POST_SENSACAO: ${{ github.event.inputs.sensacao }}
