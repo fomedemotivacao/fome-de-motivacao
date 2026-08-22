@@ -20,63 +20,46 @@ on:
   schedule:
 
     # ── FASE 1: 3x/dia | 21/08 – 03/09/2026 ────────────────────────────────
-    # Post 1 — 07h BRT (10h UTC)
     - cron: '0 10 21,22,23,24,25,26,27,28,29,30,31 8 *'
     - cron: '0 10 1,2,3 9 *'
-    # Post 2 — 13h BRT (16h UTC)
     - cron: '0 16 21,22,23,24,25,26,27,28,29,30,31 8 *'
     - cron: '0 16 1,2,3 9 *'
-    # Post 3 — 19h BRT (22h UTC)
     - cron: '0 22 21,22,23,24,25,26,27,28,29,30,31 8 *'
     - cron: '0 22 1,2,3 9 *'
 
     # ── FASE 2: 5x/dia | 04/09 – 17/09/2026 ────────────────────────────────
-    # Post 1 — 06h BRT (09h UTC)
     - cron: '0 9 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
-    # Post 2 — 09h30 BRT (12h30 UTC)
     - cron: '30 12 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
-    # Post 3 — 13h BRT (16h UTC)
     - cron: '0 16 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
-    # Post 4 — 16h30 BRT (19h30 UTC)
     - cron: '30 19 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
-    # Post 5 — 20h BRT (23h UTC)
     - cron: '0 23 4,5,6,7,8,9,10,11,12,13,14,15,16,17 9 *'
 
-    # ── FASE 3: 8x/dia | a partir de 18/09/2026 (sem data de fim) ───────────
-    # Post 1 — 06h BRT (09h UTC)
+    # ── FASE 3: 8x/dia | a partir de 18/09/2026 ─────────────────────────
     - cron: '0 9 18-31 9 *'
     - cron: '0 9 * 10-12 *'
     - cron: '0 9 * 1-7 *'
-    # Post 2 — 08h BRT (11h UTC)
     - cron: '0 11 18-31 9 *'
     - cron: '0 11 * 10-12 *'
     - cron: '0 11 * 1-7 *'
-    # Post 3 — 10h BRT (13h UTC)
     - cron: '0 13 18-31 9 *'
     - cron: '0 13 * 10-12 *'
     - cron: '0 13 * 1-7 *'
-    # Post 4 — 12h BRT (15h UTC)
     - cron: '0 15 18-31 9 *'
     - cron: '0 15 * 10-12 *'
     - cron: '0 15 * 1-7 *'
-    # Post 5 — 14h BRT (17h UTC)
     - cron: '0 17 18-31 9 *'
     - cron: '0 17 * 10-12 *'
     - cron: '0 17 * 1-7 *'
-    # Post 6 — 16h BRT (19h UTC)
     - cron: '0 19 18-31 9 *'
     - cron: '0 19 * 10-12 *'
     - cron: '0 19 * 1-7 *'
-    # Post 7 — 18h BRT (21h UTC)
     - cron: '0 21 18-31 9 *'
     - cron: '0 21 * 10-12 *'
     - cron: '0 21 * 1-7 *'
-    # Post 8 — 20h30 BRT (23h30 UTC)
     - cron: '30 23 18-31 9 *'
     - cron: '30 23 * 10-12 *'
     - cron: '30 23 * 1-7 *'
 
-  # Disparo manual com controle total
   workflow_dispatch:
     inputs:
       tema:
@@ -96,9 +79,9 @@ on:
         required: false
         default: ''
       modelo:
-        description: 'Modelo OpenRouter (ex: google/gemini-flash-1.5, anthropic/claude-haiku)'
+        description: 'Modelo OpenRouter (ex: google/gemini-2.0-flash-001, anthropic/claude-haiku-4-5)'
         required: false
-        default: 'google/gemini-flash-1.5'
+        default: 'google/gemini-2.0-flash-001'
 
 jobs:
   generate-and-publish:
@@ -122,7 +105,7 @@ jobs:
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
-          OPENROUTER_MODEL: ${{ github.event.inputs.modelo || 'google/gemini-flash-1.5' }}
+          OPENROUTER_MODEL: ${{ github.event.inputs.modelo || 'google/gemini-2.0-flash-001' }}
           POST_TEMA: ${{ github.event.inputs.tema }}
           POST_ANGULO: ${{ github.event.inputs.angulo }}
           POST_SENSACAO: ${{ github.event.inputs.sensacao }}
@@ -137,7 +120,6 @@ jobs:
       - name: Commit e push
         run: |
           git add src/data/posts.ts
-          # Só faz commit se houver mudança real
           if git diff --staged --quiet; then
             echo "⚠️ Nenhuma alteração detectada (possível duplicata evitada)."
           else
