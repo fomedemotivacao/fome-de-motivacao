@@ -119,13 +119,13 @@ jobs:
 
       - name: Commit e push
         run: |
-          git add src/data/posts.ts
+          git add src/data/posts.ts public/sitemap.xml
           if git diff --staged --quiet; then
             echo "⚠️ Nenhuma alteração detectada (possível duplicata evitada)."
           else
-            git commit -m "feat(posts): novo artigo automático [skip ci]"
+            git commit -m "feat(posts): novo artigo automático"
             git push
-            echo "🚀 Post publicado e deploy iniciado!"
+            echo "🚀 Post publicado — deploy Cloudflare iniciado!"
           fi
 
       - name: Resumo
