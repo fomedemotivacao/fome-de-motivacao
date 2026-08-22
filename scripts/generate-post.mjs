@@ -14,23 +14,24 @@
  *   POST_ANGULO          — ângulo editorial
  *   POST_SENSACAO        — reflexão que o leitor deve levar
  *   POST_PALAVRA_CHAVE   — keyword SEO
- *   OPENROUTER_MODEL     — modelo a usar (padrão: google/gemma-3-27b-it:free)
+ *   OPENROUTER_MODEL     — modelo a usar (padrão: google/gemma-4-31b-it:free)
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import https from 'https';
 
-// ─── Modelos de fallback (ordem de preferência) ───────────────────────────────
+// ─── Modelos de fallback — ATUALIZADO AGOSTO 2026 ────────────────────────────
+// Lista verificada em openrouter.ai/models (modelos :free com endpoint ativo)
 // Se o modelo principal der 429 ou 404, tenta os próximos automaticamente
 const FALLBACK_MODELS = [
-  'google/gemma-3-27b-it:free',
-  'google/gemma-3-12b-it:free',
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'meta-llama/llama-3.1-8b-instruct:free',
-  'mistralai/mistral-7b-instruct:free',
-  'qwen/qwen-2.5-72b-instruct:free',
-  'deepseek/deepseek-r1-distill-llama-70b:free',
-  'microsoft/phi-4-reasoning-plus:free',
+  'google/gemma-4-26b-a4b-it:free',          // Gemma 4 26B — multimodal, estável
+  'nvidia/nemotron-3-super-120b-a12b:free',  // Nemotron 120B — raciocínio geral
+  'nvidia/nemotron-3-nano-30b-a3b:free',     // Nemotron 30B — rápido e leve
+  'openai/gpt-oss-20b:free',                  // GPT OSS 20B — assistente geral
+  'inclusionai/ling-3.0-flash:free',          // Ling 3.0 Flash — instruções gerais
+  'nvidia/nemotron-3-ultra-550b-a55b:free',  // Nemotron Ultra 550B — longo contexto
+  'poolside/laguna-xs-2.1:free',             // Laguna XS — coding + instrução
+  'poolside/laguna-s-2.1:free',              // Laguna S — coding + instrução
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -331,7 +332,7 @@ const tema = process.env.POST_TEMA || temaDefault.tema;
 const angulo = process.env.POST_ANGULO || temaDefault.angulo;
 const sensacao = process.env.POST_SENSACAO || temaDefault.sensacao;
 const palavraChave = process.env.POST_PALAVRA_CHAVE || temaDefault.keyword;
-const modelo = process.env.OPENROUTER_MODEL || 'google/gemma-3-27b-it:free';
+const modelo = process.env.OPENROUTER_MODEL || 'google/gemma-4-31b-it:free';
 
 console.log(`🎯 Tema: ${tema}`);
 console.log(`📐 Ângulo: ${angulo}`);
