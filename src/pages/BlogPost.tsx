@@ -6,7 +6,7 @@ import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { getPost, posts } from "@/data/posts";
 
-const SITE_URL = "https://manualdoinsightaacao.com.br";
+const SITE_URL = "https://fomedemotivacao.com.br";
 const CHECKOUT_URL = "https://pay.kiwify.com.br/9h8nNa3";
 
 const formatDate = (iso: string) =>
@@ -30,7 +30,7 @@ const BlogPost = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Seo
-        title={`${post.title} | Manual do Insight à Ação`}
+        title={`${post.title} | Fome de Motivação`}
         description={post.description}
         path={`/blog/${post.slug}`}
         type="article"
@@ -95,12 +95,12 @@ const BlogPost = () => {
             },
             author: {
               "@type": "Organization",
-              name: "Manual do Insight à Ação",
+              name: "Fome de Motivação",
               url: SITE_URL,
             },
             publisher: {
               "@type": "Organization",
-              name: "Manual do Insight à Ação",
+              name: "Fome de Motivação",
               url: SITE_URL,
               logo: {
                 "@type": "ImageObject",
