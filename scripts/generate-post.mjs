@@ -20,6 +20,17 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import https from 'https';
 
+// ─── Modelos de fallback (ordem de preferência) ───────────────────────────────
+// Se o modelo principal der 429, tenta os próximos automaticamente
+const FALLBACK_MODELS = [
+  'google/gemini-flash-1.5',
+  'meta-llama/llama-3.1-8b-instruct:free',
+  'mistralai/mistral-7b-instruct:free',
+  'qwen/qwen-2-7b-instruct:free',
+  'microsoft/phi-3-mini-128k-instruct:free',
+  'nousresearch/hermes-3-llama-3.1-405b:free',
+];
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function slugify(text) {
@@ -79,6 +90,56 @@ function callOpenRouter(body) {
     req.write(payload);
     req.end();
   });
+}
+
+// ─── Chama OpenRouter com fallback automático ─────────────────────────────────
+// Se o modelo principal retornar 429 (rate limit), tenta os modelos de fallback
+
+async function callOpenRouterWithFallback(messages, primaryModel) {
+  // Monta lista: modelo principal + fallbacks (sem duplicar)
+  const models = [primaryModel, ...FALLBACK_MODELS.filter(m => m !== primaryModel)];
+
+  for (let i = 0; i < models.length; i++) {
+    const model = models[i];
+    if (i > 0) {
+      console.log(`⚠️  Tentando modelo de fallback #${i}: ${model}`);
+    }
+
+    const response = await callOpenRouter({
+      model,
+      messages,
+      max_tokens: 4500,
+      temperature: 0.85,
+    });
+
+    // Erro 429 (rate limit) → tenta próximo modelo
+    if (response.error) {
+      const code = response.error.code || response.error.status;
+      const isRateLimit = code === 429 || String(code) === '429' ||
+        (response.error.message || '').toLowerCase().includes('rate') ||
+        (response.error.message || '').toLowerCase().includes('rate-limited');
+
+      if (isRateLimit && i < models.length - 1) {
+        console.warn(`🔄 Rate limit em "${model}" — tentando próximo modelo...`);
+        continue;
+      }
+
+      // Outros erros ou sem mais fallbacks → falha
+      console.error(`❌ Erro OpenRouter com modelo "${model}":`, JSON.stringify(response.error, null, 2));
+      process.exit(1);
+    }
+
+    // Sucesso
+    if (i > 0) {
+      console.log(`✅ Artigo gerado com modelo de fallback: ${model}`);
+    } else {
+      console.log(`✅ Artigo gerado com modelo principal: ${model}`);
+    }
+    return response;
+  }
+
+  console.error('❌ Todos os modelos retornaram rate limit. Tente novamente mais tarde.');
+  process.exit(1);
 }
 
 // ─── Busca imagem no Unsplash ─────────────────────────────────────────────────
@@ -306,27 +367,19 @@ Variáveis para este artigo:
 ATENÇÃO: O artigo deve ter NO MÍNIMO 1.200 PALAVRAS. Preferencialmente entre 1.300 e 1.700 palavras.
 Responda APENAS com o artigo. Primeira linha: # Título do Artigo. Segunda linha: RESUMO: [resumo até 200 caracteres].`;
 
-// ─── Chama OpenRouter ─────────────────────────────────────────────────────────
+// ─── Chama OpenRouter com fallback automático ─────────────────────────────────
 
 console.log('⏳ Chamando OpenRouter...');
 
+const messages = [
+  { role: 'system', content: systemPrompt },
+  { role: 'user', content: userPrompt },
+];
+
 const [aiResponse, unsplashResult] = await Promise.all([
-  callOpenRouter({
-    model: modelo,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ],
-    max_tokens: 4500,
-    temperature: 0.85,
-  }),
+  callOpenRouterWithFallback(messages, modelo),
   unsplashPromise,
 ]);
-
-if (aiResponse.error) {
-  console.error('Erro OpenRouter:', JSON.stringify(aiResponse.error, null, 2));
-  process.exit(1);
-}
 
 const rawArticle = aiResponse.choices?.[0]?.message?.content;
 if (!rawArticle || rawArticle.trim().length < 500) {
