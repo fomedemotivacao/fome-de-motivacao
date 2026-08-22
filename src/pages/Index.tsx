@@ -1,7 +1,10 @@
 import { ArrowRight, Check, ChevronDown, X, Brain, Compass, Target, Zap, Repeat, Sparkles, BookOpen, Map, Rocket, Lock, Clock, ShieldCheck, Star, Quote, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import cover from "@/assets/manual-cover.jpg";
+
 
 const CHECKOUT_URL = "https://pay.kiwify.com.br/9h8nNa3";
 
