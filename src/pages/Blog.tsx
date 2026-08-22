@@ -15,8 +15,9 @@ const formatDate = (iso: string) =>
 
 const categories = ["Todos", ...Array.from(new Set(posts.map((p) => p.category)))];
 
-/** Retorna o caminho da imagem Unsplash gerada pelo workflow, com fallback para gradiente */
-const postImage = (slug: string) => `/images/posts/${slug}.jpg`;
+/** Retorna a URL da imagem: Unsplash (post.image) se disponível, senão path local */
+const postImage = (slug: string, image?: string) =>
+  image && image.startsWith("http") ? image : `/images/posts/${slug}.jpg`;
 
 const Blog = () => {
   const [active, setActive] = useState("Todos");
@@ -111,7 +112,7 @@ const Blog = () => {
                   {/* Imagem de capa */}
                   <div className="md:col-span-2 relative overflow-hidden min-h-[220px] md:min-h-full bg-gradient-to-br from-accent/10 to-accent/5">
                     <img
-                      src={postImage(featured.slug)}
+                      src={postImage(featured.slug, featured.image)}
                       alt={featured.title}
                       width={600}
                       height={400}
@@ -165,7 +166,7 @@ const Blog = () => {
                     {/* Thumbnail */}
                     <div className="relative overflow-hidden h-44 bg-gradient-to-br from-accent/10 to-accent/5 flex-shrink-0">
                       <img
-                        src={postImage(post.slug)}
+                        src={postImage(post.slug, post.image)}
                         alt={post.title}
                         width={600}
                         height={300}

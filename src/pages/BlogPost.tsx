@@ -12,6 +12,10 @@ const CHECKOUT_URL = "https://pay.kiwify.com.br/9h8nNa3";
 const formatDate = (iso: string) =>
   new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
 
+/** URL da imagem: usa Unsplash (post.image) quando disponível, senão path local */
+const resolveCover = (slug: string, image?: string) =>
+  image && image.startsWith("http") ? image : `/images/posts/${slug}.jpg`;
+
 const BlogPost = () => {
   const { slug } = useParams();
   const post = getPost(slug);
@@ -21,7 +25,7 @@ const BlogPost = () => {
   const related = posts.filter((p) => p.slug !== post.slug).slice(0, 3);
   const postUrl = `${SITE_URL}/blog/${post.slug}`;
   const effectiveModified = post.modifiedDate ?? post.date;
-  const coverImage = `/images/posts/${post.slug}.jpg`;
+  const coverImage = resolveCover(post.slug, post.image);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -81,7 +85,7 @@ const BlogPost = () => {
             ...(post.wordCount ? { wordCount: post.wordCount } : {}),
             image: {
               "@type": "ImageObject",
-              url: `${SITE_URL}/images/posts/${post.slug}.jpg`,
+              url: coverImage,
               width: 1200,
               height: 630,
             },
@@ -158,11 +162,33 @@ const BlogPost = () => {
                 decoding="async"
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  const t = e.currentTarget;
-                  t.style.display = "none";
+                  e.currentTarget.style.display = "none";
                 }}
               />
             </div>
+            {/* Crédito da imagem Unsplash */}
+            {post.imageCredit && (
+              <p className="mt-2 text-xs text-muted-foreground text-right">
+                Foto por{" "}
+                <a
+                  href={post.imageCredit.authorLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-accent transition-colors"
+                >
+                  {post.imageCredit.author}
+                </a>{" "}
+                no{" "}
+                <a
+                  href={post.imageCredit.unsplashLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-accent transition-colors"
+                >
+                  Unsplash
+                </a>
+              </p>
+            )}
           </div>
 
           <div className="max-w-3xl mx-auto px-6 lg:px-12 space-y-6">
@@ -202,7 +228,7 @@ const BlogPost = () => {
                 >
                   <div className="relative overflow-hidden h-36 bg-gradient-to-br from-accent/10 to-accent/5">
                     <img
-                      src={`/images/posts/${p.slug}.jpg`}
+                      src={resolveCover(p.slug, p.image)}
                       alt={p.title}
                       width={600}
                       height={300}
