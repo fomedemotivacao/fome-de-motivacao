@@ -14,21 +14,23 @@
  *   POST_ANGULO          — ângulo editorial
  *   POST_SENSACAO        — reflexão que o leitor deve levar
  *   POST_PALAVRA_CHAVE   — keyword SEO
- *   OPENROUTER_MODEL     — modelo a usar (padrão: google/gemini-flash-1.5)
+ *   OPENROUTER_MODEL     — modelo a usar (padrão: google/gemma-3-27b-it:free)
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import https from 'https';
 
 // ─── Modelos de fallback (ordem de preferência) ───────────────────────────────
-// Se o modelo principal der 429, tenta os próximos automaticamente
+// Se o modelo principal der 429 ou 404, tenta os próximos automaticamente
 const FALLBACK_MODELS = [
-  'google/gemini-flash-1.5',
+  'google/gemma-3-27b-it:free',
+  'google/gemma-3-12b-it:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
   'meta-llama/llama-3.1-8b-instruct:free',
   'mistralai/mistral-7b-instruct:free',
-  'qwen/qwen-2-7b-instruct:free',
-  'microsoft/phi-3-mini-128k-instruct:free',
-  'nousresearch/hermes-3-llama-3.1-405b:free',
+  'qwen/qwen-2.5-72b-instruct:free',
+  'deepseek/deepseek-r1-distill-llama-70b:free',
+  'microsoft/phi-4-reasoning-plus:free',
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -93,7 +95,8 @@ function callOpenRouter(body) {
 }
 
 // ─── Chama OpenRouter com fallback automático ─────────────────────────────────
-// Se o modelo principal retornar 429 (rate limit), tenta os modelos de fallback
+// Se o modelo principal retornar 429 (rate limit) ou 404 (não encontrado),
+// tenta os modelos de fallback automaticamente
 
 async function callOpenRouterWithFallback(messages, primaryModel) {
   // Monta lista: modelo principal + fallbacks (sem duplicar)
@@ -112,15 +115,18 @@ async function callOpenRouterWithFallback(messages, primaryModel) {
       temperature: 0.85,
     });
 
-    // Erro 429 (rate limit) → tenta próximo modelo
     if (response.error) {
       const code = response.error.code || response.error.status;
-      const isRateLimit = code === 429 || String(code) === '429' ||
-        (response.error.message || '').toLowerCase().includes('rate') ||
-        (response.error.message || '').toLowerCase().includes('rate-limited');
+      const msg = (response.error.message || '').toLowerCase();
 
-      if (isRateLimit && i < models.length - 1) {
-        console.warn(`🔄 Rate limit em "${model}" — tentando próximo modelo...`);
+      const isRateLimit = code === 429 || String(code) === '429' ||
+        msg.includes('rate') || msg.includes('rate-limited');
+      const isNotFound = code === 404 || String(code) === '404' ||
+        msg.includes('no endpoints') || msg.includes('not found');
+
+      if ((isRateLimit || isNotFound) && i < models.length - 1) {
+        const reason = isNotFound ? 'Modelo não encontrado (404)' : 'Rate limit (429)';
+        console.warn(`🔄 ${reason} em "${model}" — tentando próximo modelo...`);
         continue;
       }
 
@@ -138,7 +144,7 @@ async function callOpenRouterWithFallback(messages, primaryModel) {
     return response;
   }
 
-  console.error('❌ Todos os modelos retornaram rate limit. Tente novamente mais tarde.');
+  console.error('❌ Todos os modelos retornaram erro. Tente novamente mais tarde.');
   process.exit(1);
 }
 
@@ -325,7 +331,7 @@ const tema = process.env.POST_TEMA || temaDefault.tema;
 const angulo = process.env.POST_ANGULO || temaDefault.angulo;
 const sensacao = process.env.POST_SENSACAO || temaDefault.sensacao;
 const palavraChave = process.env.POST_PALAVRA_CHAVE || temaDefault.keyword;
-const modelo = process.env.OPENROUTER_MODEL || 'google/gemini-flash-1.5';
+const modelo = process.env.OPENROUTER_MODEL || 'google/gemma-3-27b-it:free';
 
 console.log(`🎯 Tema: ${tema}`);
 console.log(`📐 Ângulo: ${angulo}`);
