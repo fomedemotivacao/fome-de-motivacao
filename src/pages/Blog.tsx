@@ -7,7 +7,7 @@ import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { posts } from "@/data/posts";
 
-const SITE_URL = "https://manualdoinsightaacao.com.br";
+const SITE_URL = "https://fomedemotivacao.com.br";
 const CHECKOUT_URL = "https://pay.kiwify.com.br/9h8nNa3";
 
 const formatDate = (iso: string) =>
@@ -28,7 +28,7 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Seo
-        title="Blog sobre motivação, clareza e execução | Manual do Insight à Ação"
+        title="Blog sobre motivação, clareza e execução | Fome de Motivação"
         description="Artigos práticos sobre motivação, disciplina, clareza mental e produtividade para sair da paralisia e transformar ideias em ação constante."
         path="/blog"
         keywords="motivação, produtividade, clareza mental, disciplina, execução, hábitos, foco"
@@ -36,13 +36,13 @@ const Blog = () => {
           "@context": "https://schema.org",
           "@type": "Blog",
           "@id": `${SITE_URL}/blog`,
-          name: "Blog Manual do Insight à Ação",
+          name: "Blog Fome de Motivação",
           description: "Artigos sobre motivação, clareza mental, disciplina e execução.",
           url: `${SITE_URL}/blog`,
           inLanguage: "pt-BR",
           publisher: {
             "@type": "Organization",
-            name: "Manual do Insight à Ação",
+            name: "Fome de Motivação",
             url: SITE_URL,
           },
           blogPost: posts.map((p) => ({
@@ -53,7 +53,7 @@ const Blog = () => {
             datePublished: p.date,
             url: `${SITE_URL}/blog/${p.slug}`,
             inLanguage: "pt-BR",
-            author: { "@type": "Organization", name: "Manual do Insight à Ação" },
+            author: { "@type": "Organization", name: "Fome de Motivação" },
           })),
         }}
       />
